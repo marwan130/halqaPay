@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: halqapay_db
+    environment:
+      POSTGRES_DB: halqapay
+      POSTGRES_USER: halqapay
+      POSTGRES_PASSWORD: halqapay
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U halqapay"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./halqapay-backend
+    container_name: halqapay_backend
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/halqapay
+      DB_USER: halqapay
+      DB_PASS: halqapay
+      JWT_SECRET: halqapay-super-secret-jwt-key-for-demo-256-bits
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./halqapay-frontend
+    container_name: halqapay_frontend
+    environment:
+      VITE_API_URL: http://localhost:8080/api
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

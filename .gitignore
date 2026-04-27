@@ -1,0 +1,41 @@
+docs/
+halqapay_spec.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Java / Maven / Spring
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+**/dependency-reduced-pom.xml
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Coverage and reports
+**/coverage/
+**/.nyc_output/
+**/surefire-reports/
+**/failsafe-reports/
+
+# Temporary files
+*.tmp
+*.temp
+*~
