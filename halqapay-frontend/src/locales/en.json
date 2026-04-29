@@ -1,0 +1,255 @@
+{
+  "nav": {
+    "circles": "Circles",
+    "newCircle": "Start a circle",
+    "dashboard": "My dashboard",
+    "activity": "Activity",
+    "admin": "Admin",
+    "login": "Log in",
+    "getStarted": "Join now",
+    "logout": "Log out"
+  },
+  "lang": {
+    "ar": "العربية",
+    "en": "English",
+    "switch": "Language"
+  },
+  "landing": {
+    "badge": "Powered by HalqaPay",
+    "heroTitle": "Save together. Get paid faster.",
+    "heroSubtitle": "Join a savings circle with people like you. Contribute monthly, receive a full lump sum when it's your turn. Safe, structured, and fully automated.",
+    "ctaStart": "Get started for free",
+    "ctaLearn": "See how it works",
+    "ctaDashboard": "Go to my dashboard",
+    "browse": "Browse open circles",
+    "frameworkTitle": "Savings circles, without the hassle of finding people.",
+    "frameworkSubtitle": "The savings circle your community has always done, now digital, automatic, and open to everyone across the Middle East.",
+    "step1Title": "Create your account",
+    "step1Body": "Tell us your name and monthly income. We use this to make sure your commitments stay manageable.",
+    "step2Title": "Pick a circle",
+    "step2Body": "Browse circles that fit your budget. Each one shows the monthly amount and when you get paid out.",
+    "step3Title": "Get instantly approved",
+    "step3Body": "We check that your monthly payments never exceed 40% of your income, so you're always comfortable.",
+    "step4Title": "Receive your payout",
+    "step4Body": "Every month, one member gets the full pot. When your turn comes, it goes straight to your wallet.",
+    "platformTitle": "A platform built for trusted community finance",
+    "platformBody": "HalqaPay gives every member a clear view of monthly obligations, payout order, and wallet activity. Our product combines familiar savings traditions with clear digital controls to reduce confusion and increase confidence.",
+    "metrics": {
+      "membersLabel": "Community model",
+      "membersValue": "Structured savings circles",
+      "payoutLabel": "Payout policy",
+      "payoutValue": "Automated monthly distribution"
+    },
+    "approach": {
+      "title": "Our approach",
+      "transparencyTitle": "Transparent commitments",
+      "transparencyBody": "Before joining, members can view contributions, duration, and eligibility outcomes in plain language.",
+      "eligibilityTitle": "Responsible affordability checks",
+      "eligibilityBody": "Capacity checks are designed to help members avoid over-commitment and keep payments manageable.",
+      "automationTitle": "Reliable payout operations",
+      "automationBody": "Monthly collection and payout workflows are automated and traceable from your dashboard."
+    },
+    "rights": {
+      "title": "Terms, rights, and member protection",
+      "subtitle": "We make platform rules explicit so members understand responsibilities and protections before joining any circle.",
+      "item1": "You can review terms and privacy information at any time before or after account creation.",
+      "item2": "You keep visibility into your wallet activity, transaction history, and circle participation status.",
+      "item3": "Platform access may be restricted for misuse or fraud to protect all members.",
+      "readTerms": "Read terms of use",
+      "readPrivacy": "Read privacy policy"
+    }
+  },
+  "circles": {
+    "title": "Open circles",
+    "subtitle": "Find a circle that fits your monthly budget and savings goal.",
+    "loginToJoin": "to join a circle.",
+    "create": "Start a new circle",
+    "filters": "Filter",
+    "currency": "Currency",
+    "any": "All currencies",
+    "minValue": "Min amount",
+    "maxValue": "Max amount",
+    "clearFilters": "Clear",
+    "loading": "Finding circles for you…",
+    "empty": "No open circles at the moment. Check back soon or start your own.",
+    "card": {
+      "totalValue": "Circle amount",
+      "duration": "Duration",
+      "months": "months",
+      "monthly": "You pay monthly",
+      "slotsLeft": "Spots left",
+      "join": "Join circle"
+    }
+  },
+  "joinModal": {
+    "title": "Join this circle",
+    "monthlyObligation": "Your monthly payment:",
+    "checking": "Checking if this fits your budget…",
+    "approved": "Great news — you can join this circle.",
+    "rejected": "This circle exceeds your safe monthly limit.",
+    "suggestedDuration": "Minimum circle length you'd qualify for:",
+    "monthsWord": "months",
+    "newBurden": "Monthly payment for this circle:",
+    "totalBurden": "Your total monthly payments after joining:",
+    "remaining": "Budget still available:",
+    "close": "Cancel",
+    "confirm": "Yes, join circle",
+    "joining": "Joining…",
+    "needMonths": "To join comfortably, this circle needs to run for at least {{count}} months.",
+    "tryMonths": "Try a circle that runs at least {{count}} months, or reduce your current commitments first.",
+    "notApproved": "You are not eligible to join this circle right now."
+  },
+  "dashboard": {
+    "title": "My dashboard",
+    "welcome": "Welcome back, {{name}} 👋",
+    "loading": "Loading your dashboard…",
+    "noProfile": "We couldn't load your profile.",
+    "returnLogin": "Back to login",
+    "wallet": "My wallet",
+    "capacity": "Monthly budget used",
+    "capacityHint": "We keep your total circle payments below 40% of your income so you're never stretched thin.",
+    "activeTitle": "My active circles",
+    "activeEmpty": "You haven't joined any circles yet. Browse available circles and start saving today.",
+    "perMonth": "/ month",
+    "monthsLeft": "{{count}} months remaining",
+    "browse": "Browse circles",
+    "transactions": "Payment history",
+    "payoutSlot": "You are Participant #{{n}} in the payout rotation",
+    "payoutManaged": "All payouts are handled automatically by HalqaPay"
+  },
+  "topUp": {
+    "title": "Add funds",
+    "hint": "Instantly top up your wallet in {{currency}}.",
+    "amount": "Amount to add",
+    "submit": "Add funds",
+    "submitting": "Adding funds…",
+    "invalidAmount": "Please enter a valid amount."
+  },
+  "burden": {
+    "percent": "{{pct}}% used"
+  },
+  "createCircle": {
+    "back": "← Back to circles",
+    "title": "Start a new circle",
+    "subtitle": "Set the total savings amount, how many months it runs, and how many people can join.",
+    "name": "Circle name",
+    "totalValue": "Total savings amount",
+    "currency": "Currency",
+    "duration": "Duration (months)",
+    "maxMembers": "Number of members (2–20)",
+    "submit": "Create circle",
+    "submitting": "Creating your circle…",
+    "invalidTotal": "Please enter a valid savings amount.",
+    "invalidDuration": "Duration must be at least 1 month.",
+    "invalidMembers": "You need between 2 and 20 members."
+  },
+  "transactions": {
+    "title": "Payment history",
+    "subtitle": "A full record of everything that has moved in and out of your wallet.",
+    "loading": "Loading your history…",
+    "empty": "Nothing here yet. Top up your wallet or join a circle to get started."
+  },
+  "admin": {
+    "title": "Demo controls",
+    "subtitle": "Simulate the monthly cycle or reset demo data. Use this to show judges the full savings circle lifecycle.",
+    "advance": "Advance 1 month",
+    "advancing": "Running cycle…",
+    "seed": "Reset demo data",
+    "seeding": "Resetting…",
+    "activeTitle": "Active circles",
+    "activeHelp": "Each row shows how many months have passed in a circle. Advance the month to trigger contributions and a payout.",
+    "loadingActive": "Loading active circles…",
+    "emptyActive": "No active circles found. Reset demo data to generate some.",
+    "colCircle": "Circle",
+    "colMonth": "Month",
+    "colPayout": "Last payout went to",
+    "colAmount": "Amount",
+    "runAdvance": "Advance month to see payout",
+    "lastResponse": "Last cycle result",
+    "participant": "Participant #{{slot}} — Month {{month}}",
+    "dash": "—"
+  },
+  "login": {
+    "title": "Good to see you again",
+    "newHere": "Don't have an account?",
+    "register": "Sign up for free",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Log in",
+    "submitting": "Logging in…"
+  },
+  "register": {
+    "title": "Start saving with your circle",
+    "haveAccount": "Already have an account?",
+    "login": "Log in",
+    "fullName": "Full name",
+    "email": "Email address",
+    "password": "Password",
+    "phone": "Phone number",
+    "country": "Country",
+    "currency": "Your currency",
+    "salary": "Monthly income",
+    "submit": "Create my account",
+    "submitting": "Setting up your account…",
+    "invalidSalary": "Please enter your monthly income."
+  },
+  "common": {
+    "dismiss": "Dismiss",
+    "error": "Something went wrong. Please try again.",
+    "loginLink": "Log in"
+  },
+  "footer": {
+    "tagline": "Trusted savings circles, built for communities across the Middle East.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "links": {
+      "circles": "Browse circles",
+      "howItWorks": "How it works",
+      "about": "About HalqaPay",
+      "contact": "Contact",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    },
+    "copyright": "© 2026 HalqaPay. All rights reserved."
+  },
+  "howItWorks": {
+    "title": "How HalqaPay works",
+    "subtitle": "A simple four-step process to join a trusted savings circle and receive payouts on time.",
+    "stepLabel": "Step {{n}}",
+    "step1": "Create your account and complete your profile details.",
+    "step2": "Choose a circle that matches your monthly budget.",
+    "step3": "Join, contribute monthly, and track all commitments from your dashboard.",
+    "step4": "Receive your payout in your wallet when your rotation slot arrives."
+  },
+  "about": {
+    "title": "About HalqaPay",
+    "body": "HalqaPay modernizes trusted community savings circles with transparent automation, clear monthly obligations, and a mobile-first experience for the Middle East.",
+    "cards": {
+      "securityTitle": "Reliable by design",
+      "securityBody": "Secure auth, wallet visibility, and clear transaction records keep members informed at every step.",
+      "fairnessTitle": "Fair payout rotation",
+      "fairnessBody": "Circle rules and payout order are explicit, so members know exactly when they will receive funds.",
+      "regionalTitle": "Built for the region",
+      "regionalBody": "Arabic-first UX, local currency support, and familiar savings behavior tailored for local communities."
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Need support or have product feedback? Our team is here to help.",
+    "emailLabel": "Email",
+    "emailValue": "support@halqapay.com",
+    "phoneLabel": "Phone",
+    "phoneValue": "+966 11 000 0000",
+    "hoursLabel": "Support hours",
+    "hoursValue": "Sunday to Thursday, 9:00 AM - 6:00 PM"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "body": "We only collect personal data required to operate your account and savings circles.\n\nYour account information is used for authentication, eligibility checks, and account support.\n\nWe do not sell your personal data to third parties.\n\nIf you need account data changes or deletion support, contact our support team."
+  },
+  "terms": {
+    "title": "Terms of use",
+    "body": "By using HalqaPay, you agree to provide accurate profile information and maintain account security.\n\nCircle commitments are your responsibility and should match your financial capacity.\n\nHalqaPay may limit or suspend access for misuse, abuse, or fraudulent behavior.\n\nService details may evolve as we improve product reliability and compliance."
+  }
+}
