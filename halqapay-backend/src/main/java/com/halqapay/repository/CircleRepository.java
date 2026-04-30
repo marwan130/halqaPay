@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface CircleRepository extends JpaRepository<CircleEntity, UUID> {
     List<CircleEntity> findByStatus(CircleStatus status);
+    java.util.Optional<CircleEntity> findByInviteCode(String inviteCode);
 }

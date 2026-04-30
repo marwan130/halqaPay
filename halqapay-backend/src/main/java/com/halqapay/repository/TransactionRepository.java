@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
-    List<TransactionEntity> findByUserId(UUID userId);
+    List<TransactionEntity> findByUserIdOrderByCreatedAtDesc(UUID userId);
     List<TransactionEntity> findByCircleId(UUID circleId);
 }

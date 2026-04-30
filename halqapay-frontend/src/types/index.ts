@@ -61,6 +61,9 @@ export interface CircleResponse {
   status: CircleStatus;
   isAffordable?: boolean;
   isJoined?: boolean;
+  inviteCode?: string;
+  nextPayoutDate?: string | null;
+  nextDeadline?: string | null;
 }
 
 export interface CirclesListResponse {
@@ -69,12 +72,20 @@ export interface CirclesListResponse {
 
 export interface CircleJoinOrValidateResponse {
   approved: boolean;
-  monthlyBurden?: string;
-  newTotalBurden?: string;
-  remainingCapacity?: string;
+  /** In the USER's home currency */
+  monthlyBurden?: string | number;
+  /** In the USER's home currency */
+  newTotalBurden?: string | number;
+  /** In the USER's home currency */
+  remainingCapacity?: string | number;
   reason?: string;
   suggestedMinDuration?: number;
   suggestedDuration?: number;
+  /** Currency that monthlyBurden / newTotalBurden / remainingCapacity are expressed in */
+  userCurrency?: CurrencyCode;
+  /** The circle's own monthly contribution (in the circle's currency) */
+  circleMonthlyInCircleCurrency?: string | number;
+  circleCurrency?: CurrencyCode;
 }
 
 export interface ValidateCircleBody {
@@ -88,6 +99,7 @@ export interface CreateCirclePayload {
   durationMonths: number;
   currency: CurrencyCode;
   maxMembers: number;
+  isPrivate: boolean;
 }
 
 export interface UserProfileResponse {
@@ -110,6 +122,9 @@ export interface MyCircleMembershipSummary {
   name: string;
   monthlyContribution?: string | number;
   monthlyPayment?: string | number;
+  /** Monthly payment converted to user's home currency — use for DTI calculation */
+  monthlyPaymentInUserCurrency?: string | number;
+  userCurrency?: CurrencyCode;
   currency?: CurrencyCode;
   durationMonths?: number;
   currentMonth?: number;
@@ -117,6 +132,10 @@ export interface MyCircleMembershipSummary {
   slotNumber?: number;
   payoutStatus?: string;
   status?: string;
+  inviteCode?: string;
+  isPrivate?: boolean;
+  nextPayoutDate?: string | null;
+  nextDeadline?: string | null;
 }
 
 export interface MyCirclesResponse {
@@ -153,7 +172,50 @@ export interface ActiveCircleRow {
   name: string;
   monthlyAmount: string;
   currency: CurrencyCode;
+  /** In user's home currency — for burden calculations */
+  monthlyAmountInUserCurrency?: string;
+  userCurrency?: CurrencyCode;
   monthsRemaining: number;
   payoutStatus: string;
   circleStatus?: string;
+  inviteCode?: string;
+  isPrivate?: boolean;
+  nextPayoutDate?: string | null;
+  nextDeadline?: string | null;
+}
+
+export type NotificationType = "WALLET_TOPUP" | "WALLET_WITHDRAW" | "CIRCLE_PAYOUT" | "PAYMENT_DEADLINE" | "CIRCLE_ACTIVE" | "CIRCLE_JOINED" | "GENERIC";
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  type: NotificationType;
+  createdAt: string;
+}
+
+export interface CircleMemberDetailItem {
+  slotNumber: number;
+  fullName: string;
+  payoutMonth: number;
+  payoutDate: string;
+  payoutReceived: boolean;
+}
+
+export interface CircleDetailResponse {
+  circleId: string;
+  name: string;
+  currency: CurrencyCode;
+  totalValue: string | number;
+  monthlyContribution: string | number;
+  durationMonths: number;
+  currentMonth: number;
+  circleStatus: string;
+  mySlotNumber: number;
+  /** True when this month's payout goes to me — pay button is disabled */
+  isMyPayoutMonth: boolean;
+  nextPaymentDeadline: string;
+  amountRemainingToPay: string | number;
+  members: CircleMemberDetailItem[];
 }

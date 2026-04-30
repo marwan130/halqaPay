@@ -82,7 +82,7 @@ export function LandingPage() {
                 <div className="absolute inset-0 bg-primary/20 pointer-events-none" />
                 <div className="absolute inset-0 p-12 text-white pointer-events-none flex flex-col justify-end">
                   <div className="reveal space-y-2">
-                    <p className="text-xl font-bold opacity-80 tracking-wide uppercase text-xs">HalqaPay Platform</p>
+                    <p className="text-xl font-bold opacity-80 tracking-wide uppercase text-xs">{t("landing.platformLabel")}</p>
                     <p className="text-4xl font-black leading-tight tracking-tight">{t("landing.frameworkTitle")}</p>
                   </div>
                 </div>
@@ -139,7 +139,7 @@ export function LandingPage() {
           <div className="absolute inset-0 z-0">
             <img
               src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&q=80&w=2000"
-              alt="Platform Background"
+              alt={t("landing.alt.platform")}
               className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-primary/75 backdrop-blur-[2px]" />
@@ -166,7 +166,7 @@ export function LandingPage() {
           <div className="absolute inset-0 z-0 pointer-events-none">
             <img
               src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=2000"
-              alt="Community Savings"
+              alt={t("landing.alt.community")}
               className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80"
             />
             <div className="absolute inset-0 bg-primary/60" />

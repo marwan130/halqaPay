@@ -42,19 +42,18 @@ public class CircleController {
     }
 
     @GetMapping
-    public List<CircleResponse> listAvailableCircles(
+    public java.util.Map<String, List<CircleResponse>> listAvailableCircles(
             @AuthenticationPrincipal AuthUserPrincipal principal,
             @RequestParam(required = false) String currency,
             @RequestParam(required = false) java.math.BigDecimal minValue,
             @RequestParam(required = false) java.math.BigDecimal maxValue
     ) {
-        System.out.println("listAvailableCircles: principal=" + (principal != null ? principal.userId() : "null"));
         UserEntity user = null;
         if (principal != null) {
             user = userRepository.findById(principal.userId()).orElse(null);
-            System.out.println("listAvailableCircles: user found=" + (user != null));
         }
-        return circleService.listAvailableCircles(user, currency, minValue, maxValue);
+        List<CircleResponse> circles = circleService.listAvailableCircles(user, currency, minValue, maxValue);
+        return java.util.Map.of("circles", circles);
     }
 
     @PostMapping("/{id}/validate")
@@ -66,12 +65,30 @@ public class CircleController {
     }
 
     @PostMapping("/{id}/join")
-    public void joinCircle(@PathVariable UUID id, @AuthenticationPrincipal AuthUserPrincipal principal) {
+    public CircleJoinOrValidateResponse joinCircle(@PathVariable UUID id, @AuthenticationPrincipal AuthUserPrincipal principal) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required to join circles");
         }
         try {
-            circleService.joinCircle(principal.userId(), id);
+            return circleService.joinCircle(principal.userId(), id);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/join-by-code")
+    public CircleJoinOrValidateResponse joinByCode(@RequestBody java.util.Map<String, String> request, @AuthenticationPrincipal AuthUserPrincipal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required to join circles");
+        }
+        String code = request.get("code");
+        if (code == null || code.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invite code is required");
+        }
+        try {
+            return circleService.joinByCode(principal.userId(), code);
         } catch (ResponseStatusException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -87,6 +104,39 @@ public class CircleController {
         }
         try {
             circleService.leaveCircle(principal.userId(), id);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/detail")
+    public com.halqapay.dto.response.CircleDetailResponse getCircleDetail(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AuthUserPrincipal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
+        try {
+            return circleService.getCircleDetail(principal.userId(), id);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/contribute")
+    public java.util.Map<String, String> contributeToCircle(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AuthUserPrincipal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
+        try {
+            circleService.contributeToCircle(principal.userId(), id);
+            return java.util.Map.of("message", "Contribution recorded successfully");
         } catch (ResponseStatusException e) {
             throw e;
         } catch (RuntimeException e) {

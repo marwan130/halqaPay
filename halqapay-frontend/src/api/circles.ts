@@ -1,4 +1,5 @@
 import type {
+  CircleDetailResponse,
   CircleJoinOrValidateResponse,
   CircleResponse,
   CirclesListResponse,
@@ -17,8 +18,13 @@ export interface ListCirclesParams {
 export async function fetchCircles(
   params?: ListCirclesParams
 ): Promise<CircleResponse[]> {
-  const { data } = await api.get<CircleResponse[]>("/circles", { params });
-  return data;
+  const { data } = await api.get<{ circles: CircleResponse[] } | CircleResponse[]>(
+    "/circles",
+    { params }
+  );
+  // Backend wraps response: { circles: [...] }
+  if (Array.isArray(data)) return data;
+  return (data as { circles: CircleResponse[] }).circles ?? [];
 }
 
 export async function fetchCircle(id: string): Promise<CircleResponse> {
@@ -55,4 +61,21 @@ export async function joinCircle(
 
 export async function leaveCircle(circleId: string): Promise<void> {
   await api.delete(`/circles/${circleId}/leave`);
+}
+
+export async function joinByCode(code: string): Promise<CircleJoinOrValidateResponse> {
+  const { data } = await api.post<CircleJoinOrValidateResponse>("/circles/join-by-code", {
+    code
+  });
+  return data;
+}
+
+export async function getCircleDetail(circleId: string): Promise<CircleDetailResponse> {
+  const { data } = await api.get<CircleDetailResponse>(`/circles/${circleId}/detail`);
+  return data;
+}
+
+export async function contributeToCircle(circleId: string): Promise<{ message: string }> {
+  const { data } = await api.post<{ message: string }>(`/circles/${circleId}/contribute`);
+  return data;
 }

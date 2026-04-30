@@ -8,5 +8,6 @@ public record CreateCircleRequest(
     BigDecimal totalValue,
     Integer durationMonths,
     CurrencyCode currency,
-    Integer maxMembers
+    Integer maxMembers,
+    boolean isPrivate
 ) {}

@@ -69,16 +69,24 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/advance-month")
-    public void advanceAll(@AuthenticationPrincipal AuthUserPrincipal principal) {
+    @PostMapping("/simulate/advance")
+    public java.util.Map<String, Object> advanceAll(@AuthenticationPrincipal AuthUserPrincipal principal) {
         checkAdmin(principal);
         adminService.advanceAllCircles();
+        return java.util.Map.of("message", "Cycles processed successfully");
     }
 
-    @PostMapping("/advance-circle/{circleId}")
+    @PostMapping("/simulate/advance-circle/{circleId}")
     public void advanceCircle(@PathVariable UUID circleId, @AuthenticationPrincipal AuthUserPrincipal principal) {
         checkAdmin(principal);
         adminService.advanceCircle(circleId);
+    }
+
+    @PostMapping("/simulate/seed")
+    public java.util.Map<String, String> seed(@AuthenticationPrincipal AuthUserPrincipal principal) {
+        checkAdmin(principal);
+        adminService.seedDemoData();
+        return java.util.Map.of("message", "Demo data seeded successfully");
     }
 
     private void checkAdmin(AuthUserPrincipal principal) {

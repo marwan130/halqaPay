@@ -58,7 +58,7 @@ export function AboutPage() {
       <section className="mt-32 px-gutter">
         <div className="mx-auto max-w-containerMax reveal hp-glass-primary p-16 rounded-[4rem] text-center shadow-2xl">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-8">
-            Ready to experience trusted savings?
+            {t("about.ctaTitle")}
           </h2>
           <div className="flex flex-wrap justify-center gap-6">
             <a href="/register" className="btn-ieee bg-accent px-12 py-5 text-xl font-black text-primary shadow-xl">

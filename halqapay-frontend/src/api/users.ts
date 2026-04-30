@@ -32,3 +32,8 @@ export function profileToUserSummary(p: UserProfileResponse): UserSummary {
     kycStatus: p.kycStatus
   };
 }
+
+export async function updateSalary(salary: number): Promise<{ salary: string }> {
+  const { data } = await api.patch<{ salary: string }>("/users/me/salary", { salary });
+  return data;
+}

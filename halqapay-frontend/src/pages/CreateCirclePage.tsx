@@ -2,10 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
 import * as circlesApi from "../api/circles";
-import { ErrorBanner } from "../components/shared/ErrorBanner";
 import { getApiErrorMessage } from "../lib/apiError";
-import type { CurrencyCode } from "../types";
+import type { CircleResponse, CurrencyCode } from "../types";
 
 const currencies: CurrencyCode[] = [
   "USD",
@@ -26,24 +26,40 @@ export function CreateCirclePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
   const [name, setName] = useState("");
   const [totalValue, setTotalValue] = useState("8000");
   const [durationMonths, setDurationMonths] = useState("5");
-  const [currency, setCurrency] = useState<CurrencyCode>("USD");
-  const [maxMembers, setMaxMembers] = useState("10");
+  const [currency, setCurrency] = useState<CurrencyCode>("EGP");
+  const [maxMembers, setMaxMembers] = useState("5");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [createdCircle, setCreatedCircle] = useState<CircleResponse | null>(null);
 
   const mutation = useMutation({
     mutationFn: circlesApi.createCircle,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["circles"] });
       queryClient.invalidateQueries({ queryKey: ["users", "me"] });
       queryClient.invalidateQueries({ queryKey: ["users", "me", "circles"] });
+      setCreatedCircle(data);
       setSuccess(true);
     },
     onError: (err) => {
-      setError(getApiErrorMessage(err));
+      const raw = getApiErrorMessage(err);
+      // Detect backend eligibility rejection and show a translated message instead
+      if (raw.toLowerCase().includes("not eligible")) {
+        const match = raw.match(/(\d+)\s+months?/i);
+        const suggested = match ? parseInt(match[1]) : null;
+        setError(
+          suggested != null
+            ? t("createCircle.notEligibleSuggested", { count: suggested })
+            : t("createCircle.notEligible")
+        );
+      } else {
+        setError(raw);
+      }
     }
   });
 
@@ -72,38 +88,56 @@ export function CreateCirclePage() {
       return;
     }
 
-    mutation.mutate({
-      name,
-      totalValue: tv,
-      durationMonths: dm,
-      currency,
-      maxMembers: mm
-    });
+    mutation.mutate({ name, totalValue: tv, durationMonths: dm, currency, maxMembers: mm, isPrivate });
   }
 
-  if (success) {
+  if (success && createdCircle) {
     return (
-      <main className="mx-auto max-w-lg px-gutter py-20 text-center">
+      <main className="mx-auto max-w-lg px-gutter py-12 text-center">
         <div className="flex flex-col items-center space-y-6 animate-fade-in-up">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success-container text-success-on shadow-lg shadow-success-container/20">
             <span className="material-symbols-outlined text-5xl">verified</span>
           </div>
-          <h1 className="text-3xl font-black text-primary">{t("createCircle.successTitle", "Circle Created!")}</h1>
-          <p className="text-lg text-on-surface-variant font-medium">
-            {t("createCircle.successSubtitle", "Your circle is now live and you've been joined as the first member.")}
-          </p>
+          <h1 className="text-3xl font-black text-primary">{t("createCircle.successTitle")}</h1>
+
+          <div className="w-full space-y-4 rounded-3xl bg-surface-lowest p-8 shadow-xl border border-outline-variant/30">
+            <p className="text-sm font-bold uppercase tracking-widest text-on-surface-variant/60">
+              {t("createCircle.inviteFriends")}
+            </p>
+
+            <div className="relative flex flex-col items-center py-4 gap-4">
+              {/* Real QR code that encodes a deep-link to the join flow */}
+              <div className="rounded-2xl bg-white p-4 shadow-md border border-outline-variant/20">
+                <QRCode
+                  value={`${window.location.origin}/circles?code=${createdCircle.inviteCode ?? ""}`}
+                  size={160}
+                  bgColor="#ffffff"
+                  fgColor="#1a1a2e"
+                  level="M"
+                />
+              </div>
+              <div className="text-3xl font-mono font-black tracking-[0.4em] text-primary bg-primary/5 px-6 py-3 rounded-xl border-2 border-dashed border-primary/20">
+                {createdCircle.inviteCode ?? "—"}
+              </div>
+            </div>
+
+            <p className="text-sm text-on-surface-variant px-4">
+              {t("createCircle.shareCode")}
+            </p>
+          </div>
+
           <div className="flex flex-col gap-3 w-full pt-4">
             <button
               onClick={() => navigate("/dashboard")}
               className="w-full rounded-xl bg-primary py-4 text-lg font-bold text-primary-on shadow-card transition-all hover:scale-[1.02] active:scale-95"
             >
-              {t("createCircle.goToDashboard", "Go to Dashboard")}
+              {t("createCircle.goToDashboard")}
             </button>
             <Link
               to="/circles"
               className="w-full rounded-xl border-2 border-primary py-4 text-lg font-bold text-primary transition-all hover:bg-surface-low text-center"
             >
-              {t("createCircle.viewAll", "View All Circles")}
+              {t("createCircle.viewAll")}
             </Link>
           </div>
         </div>
@@ -118,16 +152,16 @@ export function CreateCirclePage() {
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-error-container text-error-on shadow-lg shadow-error-container/20">
             <span className="material-symbols-outlined text-5xl">error</span>
           </div>
-          <h1 className="text-3xl font-black text-primary">{t("createCircle.errorTitle", "Creation Failed")}</h1>
-          <div className="rounded-2xl bg-error-container/10 p-6 border border-error-container/20">
-            <p className="text-lg text-error font-bold leading-relaxed">
+          <h1 className="text-3xl font-black text-primary">{t("createCircle.errorTitle")}</h1>
+          <div className="w-full rounded-2xl bg-error-container/10 p-6 border border-error-container/30 text-left">
+            <p className="text-base text-error font-bold leading-relaxed">
               {error}
             </p>
           </div>
           <p className="text-on-surface-variant font-medium">
-            {t("createCircle.errorSubtitle", "Please adjust your circle parameters and try again.")}
+            {t("createCircle.errorSubtitle")}
           </p>
-          <div className="flex flex-col gap-3 w-full pt-4">
+          <div className="flex flex-col gap-3 w-full pt-2">
             <button
               onClick={() => {
                 setError(null);
@@ -135,13 +169,13 @@ export function CreateCirclePage() {
               }}
               className="w-full rounded-xl bg-primary py-4 text-lg font-bold text-primary-on shadow-card transition-all hover:scale-[1.02] active:scale-95"
             >
-              {t("createCircle.tryAgain", "Adjust & Try Again")}
+              {t("createCircle.tryAgain")}
             </button>
             <button
               onClick={() => navigate("/dashboard")}
               className="w-full rounded-xl border-2 border-primary py-4 text-lg font-bold text-primary transition-all hover:bg-surface-low"
             >
-              {t("createCircle.cancel", "Back to Dashboard")}
+              {t("createCircle.cancel")}
             </button>
           </div>
         </div>
@@ -162,7 +196,6 @@ export function CreateCirclePage() {
       <p className="mt-2 text-sm text-on-surface-variant">{t("createCircle.subtitle")}</p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
-        {error ? <ErrorBanner message={error} onDismiss={() => setError(null)} /> : null}
         <div>
           <label htmlFor="c-name" className="text-sm font-semibold text-on-surface">
             {t("createCircle.name")}
@@ -175,6 +208,7 @@ export function CreateCirclePage() {
             className={inputClass}
           />
         </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="c-value" className="text-sm font-semibold text-on-surface">
@@ -210,6 +244,7 @@ export function CreateCirclePage() {
             </select>
           </div>
         </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="c-months" className="text-sm font-semibold text-on-surface">
@@ -243,6 +278,49 @@ export function CreateCirclePage() {
             />
           </div>
         </div>
+
+        {/* Visibility toggle */}
+        <div className="rounded-2xl border border-outline-variant bg-surface-low p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold text-on-surface">{t("createCircle.visibility")}</p>
+              <p className="mt-0.5 text-xs text-on-surface-variant">
+                {isPrivate ? t("createCircle.privateHint") : t("createCircle.publicHint")}
+              </p>
+            </div>
+            {/* Pill toggle */}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isPrivate}
+              onClick={() => setIsPrivate((v) => !v)}
+              className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                isPrivate ? "border-primary bg-primary" : "border-outline-variant bg-surface-variant"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                  isPrivate ? "translate-x-7" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="mt-3 flex gap-3">
+            <div className={`flex-1 rounded-xl border-2 p-3 text-center transition-all ${
+              !isPrivate ? "border-primary bg-primary/5" : "border-outline-variant/40"
+            }`}>
+              <span className="material-symbols-outlined text-primary text-2xl">public</span>
+              <p className="mt-1 text-xs font-bold text-on-surface">{t("createCircle.public")}</p>
+            </div>
+            <div className={`flex-1 rounded-xl border-2 p-3 text-center transition-all ${
+              isPrivate ? "border-primary bg-primary/5" : "border-outline-variant/40"
+            }`}>
+              <span className="material-symbols-outlined text-primary text-2xl">lock</span>
+              <p className="mt-1 text-xs font-bold text-on-surface">{t("createCircle.private")}</p>
+            </div>
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={mutation.isPending}

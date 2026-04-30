@@ -19,22 +19,22 @@ const currencies: CurrencyCode[] = [
 ];
 
 const middleEastCountries = [
-  { value: "Bahrain", label: "Bahrain - البحرين" },
-  { value: "Cyprus", label: "Cyprus - قبرص" },
-  { value: "Egypt", label: "Egypt - مصر" },
-  { value: "Iran", label: "Iran - إيران" },
-  { value: "Iraq", label: "Iraq - العراق" },
-  { value: "Jordan", label: "Jordan - الأردن" },
-  { value: "Kuwait", label: "Kuwait - الكويت" },
-  { value: "Lebanon", label: "Lebanon - لبنان" },
-  { value: "Oman", label: "Oman - عُمان" },
-  { value: "Palestine", label: "Palestine - فلسطين" },
-  { value: "Qatar", label: "Qatar - قطر" },
-  { value: "Saudi Arabia", label: "Saudi Arabia - السعودية" },
-  { value: "Syria", label: "Syria - سوريا" },
-  { value: "Turkey", label: "Turkey - تركيا" },
-  { value: "United Arab Emirates", label: "United Arab Emirates - الإمارات" },
-  { value: "Yemen", label: "Yemen - اليمن" }
+  "Bahrain",
+  "Cyprus",
+  "Egypt",
+  "Iran",
+  "Iraq",
+  "Jordan",
+  "Kuwait",
+  "Lebanon",
+  "Oman",
+  "Palestine",
+  "Qatar",
+  "Saudi Arabia",
+  "Syria",
+  "Turkey",
+  "United Arab Emirates",
+  "Yemen"
 ];
 
 const inputClass =
@@ -174,8 +174,8 @@ export function RegisterPage() {
             className={inputClass}
           >
             {middleEastCountries.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
+              <option key={c} value={c}>
+                {t(`register.countries.${c}`)}
               </option>
             ))}
           </select>

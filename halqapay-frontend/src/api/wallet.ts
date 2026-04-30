@@ -17,3 +17,10 @@ export async function topUpWallet(amount: number): Promise<{ newBalance: string 
   });
   return data;
 }
+
+export async function withdrawWallet(amount: number): Promise<{ newBalance: string }> {
+  const { data } = await api.post<{ newBalance: string }>("/wallet/withdraw", {
+    amount
+  });
+  return data;
+}

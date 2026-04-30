@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { CircleJoinOrValidateResponse, CircleResponse } from "../../types";
+import type { CircleJoinOrValidateResponse, CircleResponse, CurrencyCode } from "../../types";
 import * as circlesApi from "../../api/circles";
 import { getApiErrorMessage, parseJoinOrValidateFromError } from "../../lib/apiError";
 import { CurrencyDisplay } from "../shared/CurrencyDisplay";
@@ -51,47 +51,32 @@ export function JoinCircleModal({
     setError(null);
     setJoinMessage(null);
 
-    const body = {
-      totalValue: Number(activeCircle.totalValue),
-      durationMonths: activeCircle.durationMonths
-    };
-
     circlesApi
-      .validateCircle(circleId, body)
-      .then((res) => {
-        if (!cancelled) {
-          setValidation(res);
-        }
+      .validateCircle(circleId, {
+        totalValue: Number(activeCircle.totalValue),
+        durationMonths: activeCircle.durationMonths
       })
+      .then((res) => { if (!cancelled) setValidation(res); })
       .catch((e) => {
         if (!cancelled) {
           const parsed = parseJoinOrValidateFromError(e);
-          if (parsed) {
-            setValidation(parsed);
-          } else {
-            setError(getApiErrorMessage(e));
-          }
+          if (parsed) setValidation(parsed);
+          else setError(getApiErrorMessage(e));
         }
       })
-      .finally(() => {
-        if (!cancelled) setValidating(false);
-      });
+      .finally(() => { if (!cancelled) setValidating(false); });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [open, circleId, activeCircle]);
 
   if (!open || !activeCircle || !circleId) return null;
-  const resolvedCircle = activeCircle;
 
   async function handleJoin() {
-    const id = resolvedCircle.id;
     setError(null);
     setJoinMessage(null);
     setJoining(true);
     try {
-      const res = await circlesApi.joinCircle(id);
+      const res = await circlesApi.joinCircle(activeCircle!.id);
       if (!res.approved) {
         setValidation(res);
         const hint = suggestedMonths(res);
@@ -111,11 +96,11 @@ export function JoinCircleModal({
       if (parsed) {
         setValidation(parsed);
         const hint = suggestedMonths(parsed);
-        if (!parsed.approved && hint != null) {
-          setJoinMessage(t("joinModal.tryMonths", { count: hint }));
-        } else {
-          setJoinMessage(parsed.reason ?? null);
-        }
+        setJoinMessage(
+          !parsed.approved && hint != null
+            ? t("joinModal.tryMonths", { count: hint })
+            : (parsed.reason ?? null)
+        );
       } else {
         setError(getApiErrorMessage(e));
       }
@@ -125,6 +110,16 @@ export function JoinCircleModal({
   }
 
   const suggestion = validation ? suggestedMonths(validation) : null;
+
+  // The circle's currency and what members actually deposit each month
+  const circleCcy = (validation?.circleCurrency ?? activeCircle.currency) as CurrencyCode;
+  const circleMonthly = validation?.circleMonthlyInCircleCurrency ?? activeCircle.monthlyContribution;
+
+  // The user's home currency — what DTI values are expressed in
+  const userCcy = (validation?.userCurrency ?? activeCircle.currency) as CurrencyCode;
+
+  // Whether the circle currency matches the user's currency
+  const sameCurrency = circleCcy === userCcy;
 
   return (
     <div
@@ -138,81 +133,123 @@ export function JoinCircleModal({
         className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-modal border border-outline-variant bg-surface-lowest p-6 shadow-cardLg"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <h2 id="join-modal-title" className="text-lg font-bold text-primary">
           {t("joinModal.title")}
         </h2>
-        <p className="mt-1 text-sm text-on-surface-variant">{resolvedCircle.name}</p>
-        <p className="mt-3 text-sm text-on-surface">
-          {t("joinModal.monthlyObligation")}{" "}
-          <CurrencyDisplay
-            amount={resolvedCircle.monthlyContribution}
-            currency={resolvedCircle.currency}
-          />
-        </p>
+        <p className="mt-1 text-sm text-on-surface-variant">{activeCircle.name}</p>
 
-        {validating ? (
+        {/* What you'll deposit each month — always in the circle's currency */}
+        <div className="mt-4 rounded-xl bg-primary/5 border border-primary/15 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant/60">
+            {t("joinModal.circleMonthlyLabel")}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-primary">
+            <CurrencyDisplay amount={circleMonthly} currency={circleCcy} />
+            <span className="ms-1 text-sm font-medium text-on-surface-variant">
+              / {t("joinModal.month")}
+            </span>
+          </p>
+          {!sameCurrency && (
+            <p className="mt-1 text-[11px] text-on-surface-variant/70 italic">
+              {t("joinModal.paidInCurrency", { currency: circleCcy })}
+            </p>
+          )}
+        </div>
+
+        {/* DTI check loading */}
+        {validating && (
           <div className="mt-6">
             <LoadingSpinner label={t("joinModal.checking")} />
           </div>
-        ) : null}
+        )}
 
-        {error ? (
+        {/* Error */}
+        {error && (
           <div className="mt-4">
             <ErrorBanner message={error} onDismiss={() => setError(null)} />
           </div>
-        ) : null}
+        )}
 
-        {!validating && validation ? (
-          <div className="mt-4 rounded-xl border border-outline-variant bg-surface-low p-4 text-sm text-on-surface">
-            {validation.approved ? (
-              <p className="font-bold text-emerald-800">{t("joinModal.approved")}</p>
-            ) : (
-              <p className="font-bold text-red-900">{t("joinModal.rejected")}</p>
+        {/* Validation result */}
+        {!validating && validation && (
+          <div className="mt-4 rounded-xl border border-outline-variant bg-surface-low p-4 text-sm space-y-3">
+
+            {/* Status badge */}
+            <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+              validation.approved
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-red-100 text-red-900"
+            }`}>
+              <span className="material-symbols-outlined text-[14px]">
+                {validation.approved ? "check_circle" : "cancel"}
+              </span>
+              {validation.approved ? t("joinModal.approved") : t("joinModal.rejected")}
+            </div>
+
+            {!validation.approved && (
+              <p className="text-on-surface-variant text-xs">
+                {t("joinModal.dtiExceeded")}
+              </p>
             )}
-            {validation.reason ? (
-              <p className="mt-2 text-on-surface-variant">{validation.reason}</p>
-            ) : null}
-            {!validation.approved && suggestion != null ? (
-              <p className="mt-2 text-on-surface">
+
+            {!validation.approved && suggestion != null && (
+              <p className="text-on-surface">
                 {t("joinModal.suggestedDuration")}{" "}
                 <span className="font-bold tabular-nums">{suggestion}</span>{" "}
                 {t("joinModal.monthsWord")}
               </p>
-            ) : null}
-            {validation.monthlyBurden != null ? (
-              <p className="mt-2 text-on-surface-variant">
-                {t("joinModal.newBurden")}{" "}
-                <CurrencyDisplay
-                  amount={validation.monthlyBurden}
-                  currency={resolvedCircle.currency}
-                />
-              </p>
-            ) : null}
-            {validation.newTotalBurden != null ? (
-              <p className="mt-1 text-on-surface-variant">
-                {t("joinModal.totalBurden")}{" "}
-                <CurrencyDisplay
-                  amount={validation.newTotalBurden}
-                  currency={resolvedCircle.currency}
-                />
-              </p>
-            ) : null}
-            {validation.remainingCapacity != null ? (
-              <p className="mt-1 text-on-surface-variant">
-                {t("joinModal.remaining")}{" "}
-                <CurrencyDisplay
-                  amount={validation.remainingCapacity}
-                  currency={resolvedCircle.currency}
-                />
-              </p>
-            ) : null}
+            )}
+
+            {/* Budget breakdown — expressed in user's currency */}
+            <div className="border-t border-outline-variant/30 pt-3 space-y-2">
+              {!sameCurrency && (
+                <p className="text-[11px] font-semibold text-on-surface-variant/60 uppercase tracking-wider">
+                  {t("joinModal.budgetInCurrency", { currency: userCcy })}
+                </p>
+              )}
+
+              {validation.monthlyBurden != null && (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-on-surface-variant">
+                    {sameCurrency
+                      ? t("joinModal.monthlyPayment")
+                      : t("joinModal.monthlyPaymentConverted")}
+                  </span>
+                  <span className="font-bold tabular-nums text-on-surface">
+                    <CurrencyDisplay amount={validation.monthlyBurden} currency={userCcy} />
+                  </span>
+                </div>
+              )}
+
+              {validation.newTotalBurden != null && (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-on-surface-variant">{t("joinModal.totalBurden")}</span>
+                  <span className="font-bold tabular-nums text-on-surface">
+                    <CurrencyDisplay amount={validation.newTotalBurden} currency={userCcy} />
+                  </span>
+                </div>
+              )}
+
+              {validation.remainingCapacity != null && (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-on-surface-variant">{t("joinModal.remaining")}</span>
+                  <span className={`font-bold tabular-nums ${
+                    Number(validation.remainingCapacity) >= 0 ? "text-emerald-700" : "text-red-700"
+                  }`}>
+                    <CurrencyDisplay amount={validation.remainingCapacity} currency={userCcy} />
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        ) : null}
+        )}
 
-        {joinMessage ? (
+        {joinMessage && (
           <div className="mt-3 text-sm font-medium text-secondary">{joinMessage}</div>
-        ) : null}
+        )}
 
+        {/* Actions */}
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           <button
             type="button"
@@ -221,7 +258,7 @@ export function JoinCircleModal({
           >
             {t("joinModal.close")}
           </button>
-          {!validating && validation?.approved ? (
+          {!validating && validation?.approved && (
             <button
               type="button"
               onClick={() => void handleJoin()}
@@ -230,7 +267,7 @@ export function JoinCircleModal({
             >
               {joining ? t("joinModal.joining") : t("joinModal.confirm")}
             </button>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

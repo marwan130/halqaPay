@@ -10,12 +10,23 @@
     "admin": "Admin",
     "login": "Log in",
     "getStarted": "Join now",
-    "logout": "Log out"
+    "getStartedCompact": "Join",
+    "logout": "Log out",
+    "logoutCompact": "Exit",
+    "logoAlt": "HalqaPay logo"
   },
   "lang": {
     "ar": "العربية",
     "en": "English",
     "switch": "Language"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "notifications": {
+    "inbox": "Inbox",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications yet"
   },
   "landing": {
     "badge": "Powered by HalqaPay",
@@ -97,12 +108,22 @@
       "a2": "HalqaPay handles the risk. Every member is verified, and we guarantee the payout to the scheduled member in their turn.",
       "q3": "Can I leave a circle early?",
       "a3": "Circles are commitments. You can only leave if the circle hasn't started yet."
+    },
+    "platformLabel": "HalqaPay Platform",
+    "alt": {
+      "platform": "Platform Background",
+      "community": "Community Savings"
     }
   },
   "circles": {
     "title": "Open circles",
     "subtitle": "Find a circle that fits your monthly budget and savings goal.",
-    "loginToJoin": "to join a circle.",
+    "loginToJoin": "to join circles.",
+    "enterCode": "Circle code",
+    "join": "Join",
+    "joinSuccessTitle": "Successfully Joined!",
+    "joinSuccessMessage": "You have successfully joined the circle using the invite code. Welcome to the group!",
+    "goToDashboard": "Go to Dashboard",
     "create": "Start a new circle",
     "filters": "Filter",
     "currency": "Currency",
@@ -117,36 +138,50 @@
       "duration": "Duration",
       "months": "months",
       "monthly": "You pay monthly",
-      "slotsLeft": "Spots left",
+      "slotsLeft": "Slots left",
       "join": "Join circle",
-      "affordable": "Affordable"
+      "affordable": "Affordable",
+      "alreadyJoined": "Membership Confirmed",
+      "nextPayout": "Next Payout",
+      "deadline": "Pay-up Deadline"
+    },
+    "status": {
+      "OPEN": "Open",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed"
     }
   },
   "joinModal": {
     "title": "Join this circle",
-    "monthlyObligation": "Your monthly payment:",
+    "circleMonthlyLabel": "Monthly contribution",
+    "month": "month",
+    "paidInCurrency": "Deposited into the circle in {{currency}}",
     "checking": "Checking if this fits your budget…",
-    "approved": "Great news — you can join this circle.",
-    "rejected": "This circle exceeds your safe monthly limit.",
-    "suggestedDuration": "Minimum circle length you'd qualify for:",
+    "approved": "You can join this circle",
+    "rejected": "This circle exceeds your safe monthly limit",
+    "dtiExceeded": "Your total monthly commitments would exceed 40% of your income.",
+    "suggestedDuration": "Minimum duration you would qualify for:",
     "monthsWord": "months",
-    "newBurden": "Monthly payment for this circle:",
-    "totalBurden": "Your total monthly payments after joining:",
-    "remaining": "Budget still available:",
+    "budgetInCurrency": "Your DTI budget (in {{currency}})",
+    "monthlyPayment": "This circle costs you:",
+    "monthlyPaymentConverted": "Equivalent in your currency:",
+    "totalBurden": "Total burden after joining:",
+    "remaining": "DTI budget remaining:",
     "close": "Cancel",
     "confirm": "Yes, join circle",
     "joining": "Joining…",
+    "notApproved": "You are not eligible to join this circle right now.",
     "needMonths": "To join comfortably, this circle needs to run for at least {{count}} months.",
-    "tryMonths": "Try a circle that runs at least {{count}} months, or reduce your current commitments first.",
-    "notApproved": "You are not eligible to join this circle right now."
+    "tryMonths": "Try a circle that runs at least {{count}} months, or reduce your current commitments first."
   },
   "dashboard": {
     "title": "My dashboard",
-    "welcome": "Welcome back, {{name}} 👋",
+    "welcome": "Welcome back, {{name}}",
     "loading": "Loading your dashboard…",
     "noProfile": "We couldn't load your profile.",
     "returnLogin": "Back to login",
     "wallet": "My wallet",
+    "salary": "Monthly Salary",
     "capacity": "Monthly budget used",
     "capacityHint": "We keep your total circle payments below 40% of your income so you're never stretched thin.",
     "kyc": {
@@ -166,7 +201,69 @@
     "browse": "Browse circles",
     "transactions": "Payment history",
     "payoutSlot": "You are Participant #{{n}} in the payout rotation",
-    "payoutManaged": "All payouts are handled automatically by HalqaPay"
+    "payoutManaged": "All payouts are handled automatically by HalqaPay",
+    "loadingCircles": "Syncing circles...",
+    "leaving": "Leaving...",
+    "leaveCircle": "Leave Circle",
+    "fallbackName": "Member",
+    "private": "Private",
+    "clickToView": "Click to view details",
+    "share": {
+      "button": "Share",
+      "title": "Share Circle",
+      "hint": "Anyone with this code can request to join your circle.",
+      "copy": "Copy code",
+      "copied": "Copied!",
+      "noCode": "No invite code available for this circle."
+    },
+    "time": {
+      "deadlineLabel": "Payment deadline",
+      "payoutLabel": "Next payout",
+      "days": "days",
+      "hours": "hrs",
+      "minutes": "min",
+      "seconds": "sec",
+      "passed": "Due"
+    },
+    "topUpModal": {
+      "title": "Top Up Wallet",
+      "hint": "Enter the amount to add to your wallet.",
+      "amountLabel": "Amount",
+      "placeholder": "e.g. 1000",
+      "processing": "Processing…",
+      "confirm": "Confirm Top Up",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "validAmount": "Please enter a valid positive amount."
+    },
+    "salaryModal": {
+      "title": "Edit Salary",
+      "hint": "Updating your salary will affect your eligibility for circles.",
+      "label": "Monthly Salary",
+      "updating": "Updating…",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    }
+  },
+  "circleDetail": {
+    "totalValue": "Total Value",
+    "monthly": "Monthly",
+    "mySlot": "My Slot",
+    "payDeadline": "Payment Deadline",
+    "daysLeft": "days left",
+    "remainingToPay": "Amount remaining to pay",
+    "myPayoutMonth": "It's your payout month! No payment needed this cycle.",
+    "payNow": "Pay {{amount}} contribution",
+    "paying": "Processing…",
+    "paySuccess": "Contribution paid successfully!",
+    "membersTitle": "Circle Members & Payout Schedule",
+    "you": "You",
+    "slotPayoutDate": "Payout on {{date}}",
+    "received": "Paid out",
+    "thisCycle": "This cycle",
+    "upcoming": "Upcoming",
+    "monthOf": "Month {{current}} of {{total}}"
   },
   "topUp": {
     "title": "Add funds",
@@ -175,6 +272,16 @@
     "submit": "Add funds",
     "submitting": "Adding funds…",
     "invalidAmount": "Please enter a valid amount."
+  },
+  "withdraw": {
+    "title": "Withdraw funds",
+    "hint": "Instantly withdraw from your wallet to your bank account.",
+    "amount": "Amount to withdraw",
+    "submit": "Withdraw funds",
+    "submitting": "Withdrawing funds…",
+    "invalidAmount": "Please enter a valid amount.",
+    "insufficient": "Insufficient balance.",
+    "cancel": "Cancel"
   },
   "burden": {
     "percent": "{{pct}}% used"
@@ -192,13 +299,40 @@
     "submitting": "Creating your circle…",
     "invalidTotal": "Please enter a valid savings amount.",
     "invalidDuration": "Duration must be at least 1 month.",
-    "invalidMembers": "You need between 2 and 20 members."
+    "invalidMembers": "You need between 2 and 20 members.",
+    "successTitle": "Circle Created!",
+    "successSubtitle": "Your circle is now live and you've been joined as the first member.",
+    "inviteFriends": "Invite Friends",
+    "shareCode": "Share this code with friends so they can join your circle instantly!",
+    "notEligible": "You are not eligible to start this circle based on your current income and commitments.",
+    "notEligibleSuggested": "You are not eligible to start this circle based on your current income and commitments. Try a duration of at least {{count}} months.",
+    "goToDashboard": "Go to Dashboard",
+    "viewAll": "View All Circles",
+    "errorTitle": "Creation Failed",
+    "errorSubtitle": "Please adjust your circle parameters and try again.",
+    "tryAgain": "Adjust & Try Again",
+    "cancel": "Back to Dashboard",
+    "visibility": "Circle visibility",
+    "public": "Public",
+    "publicHint": "Anyone can discover and request to join this circle.",
+    "private": "Private",
+    "privateHint": "Only people with the invite code can join this circle."
   },
   "transactions": {
     "title": "Payment history",
     "subtitle": "A full record of everything that has moved in and out of your wallet.",
     "loading": "Loading your history…",
-    "empty": "Nothing here yet. Top up your wallet or join a circle to get started."
+    "empty": "Nothing here yet. Top up your wallet or join a circle to get started.",
+    "types": {
+      "TOP_UP": "Top Up",
+      "CONTRIBUTION": "Contribution",
+      "PAYOUT": "Payout"
+    },
+    "status": {
+      "SUCCESS": "Success",
+      "PENDING": "Pending",
+      "FAILED": "Failed"
+    }
   },
   "kyc": {
     "uploadTitle": "Verify your salary",
@@ -207,7 +341,8 @@
     "uploadHint": "Please upload a PDF or picture of your salary cheque or a letter from your company to a secure host and provide the link here.",
     "submit": "Submit for review",
     "submitting": "Submitting...",
-    "success": "Your document has been submitted for review."
+    "success": "Your document has been submitted for review.",
+    "placeholderUrl": "https://example.com/my-salary-slip.pdf"
   },
   "admin": {
     "title": "Demo controls",
@@ -261,12 +396,31 @@
     "salary": "Monthly income",
     "submit": "Create my account",
     "submitting": "Setting up your account…",
-    "invalidSalary": "Please enter your monthly income."
+    "invalidSalary": "Please enter your monthly income.",
+    "countries": {
+      "Bahrain": "Bahrain",
+      "Cyprus": "Cyprus",
+      "Egypt": "Egypt",
+      "Iran": "Iran",
+      "Iraq": "Iraq",
+      "Jordan": "Jordan",
+      "Kuwait": "Kuwait",
+      "Lebanon": "Lebanon",
+      "Oman": "Oman",
+      "Palestine": "Palestine",
+      "Qatar": "Qatar",
+      "Saudi Arabia": "Saudi Arabia",
+      "Syria": "Syria",
+      "Turkey": "Turkey",
+      "United Arab Emirates": "United Arab Emirates",
+      "Yemen": "Yemen"
+    }
   },
   "common": {
     "dismiss": "Dismiss",
     "error": "Something went wrong. Please try again.",
-    "loginLink": "Log in"
+    "loginLink": "Log in",
+    "cancel": "Cancel"
   },
   "footer": {
     "tagline": "Trusted savings circles, built for communities across the Middle East.",
@@ -302,11 +456,12 @@
       "fairnessBody": "Circle rules and payout order are explicit, so members know exactly when they will receive funds.",
       "regionalTitle": "Built for the region",
       "regionalBody": "Arabic first UX, local currency support, and familiar savings behavior tailored for local communities."
-    }
+    },
+    "ctaTitle": "Ready to experience trusted savings?"
   },
   "contact": {
     "title": "Contact us",
-    "subtitle": "Need support or have product feedback? Our team is here to help.",
+    "subtitle": "Need support or have any feedback? Our team is here to help.",
     "emailLabel": "Email",
     "emailValue": "support@halqapay.com",
     "phoneLabel": "Phone",
@@ -323,7 +478,8 @@
       "success": "Thank you! We've received your message and will get back to you soon.",
       "placeholderName": "John Doe",
       "placeholderEmail": "john@example.com",
-      "placeholderSubject": "General Inquiry"
+      "placeholderSubject": "General Inquiry",
+      "sendAnother": "Send another message"
     },
     "locationTitle": "Our Office",
     "locationAddress": "Digital City, Riyadh, Saudi Arabia"

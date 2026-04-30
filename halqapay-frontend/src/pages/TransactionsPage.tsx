@@ -48,7 +48,7 @@ export function TransactionsPage() {
                 className="px-4 py-4 sm:flex sm:items-center sm:justify-between"
               >
                 <div>
-                  <p className="font-bold text-primary">{tx.type}</p>
+                  <p className="font-bold text-primary">{t(`transactions.types.${tx.type}`, tx.type)}</p>
                   <p className="text-xs text-on-surface-variant">
                     {formatWhen(tx.createdAt, i18n.language)}
                   </p>
@@ -60,7 +60,7 @@ export function TransactionsPage() {
                   <p className="text-sm font-bold tabular-nums text-primary">
                     <CurrencyDisplay amount={tx.amount} currency={tx.currency} />
                   </p>
-                  <p className="text-xs text-on-surface-variant">{tx.status}</p>
+                  <p className="text-xs text-on-surface-variant">{t(`transactions.status.${tx.status}`, tx.status)}</p>
                 </div>
               </li>
             ))}

@@ -27,4 +27,10 @@ public interface CircleMembershipRepository extends JpaRepository<CircleMembersh
             @org.springframework.data.repository.query.Param("circleId") java.util.UUID circleId,
             @org.springframework.data.repository.query.Param("userId") java.util.UUID userId
     );
+
+    @org.springframework.data.jpa.repository.Query(value = "SELECT * FROM circle_memberships WHERE circle_id = CAST(:circleId AS UUID) AND slot_number = :slotNumber", nativeQuery = true)
+    java.util.Optional<CircleMembershipEntity> findByCircleIdAndSlotNumber(
+            @org.springframework.data.repository.query.Param("circleId") java.util.UUID circleId,
+            @org.springframework.data.repository.query.Param("slotNumber") int slotNumber
+    );
 }

@@ -63,7 +63,7 @@ export function ContactPage() {
                   onClick={() => setSent(false)}
                   className="rounded-xl border border-outline-variant px-8 py-3 font-bold text-primary transition-colors hover:bg-surface-low"
                 >
-                  Send another message
+                  {t("contact.form.sendAnother")}
                 </button>
               </div>
             ) : (

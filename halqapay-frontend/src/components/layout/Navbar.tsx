@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useAuthStore } from "../../store/authStore";
 import { CurrencyDisplay } from "../shared/CurrencyDisplay";
 import { LanguageSwitcher } from "../shared/LanguageSwitcher";
+import { NotificationInbox } from "../shared/NotificationInbox";
 
 const linkClass =
   "rounded-full px-2 py-2 text-sm font-semibold text-white/85 transition-colors hover:bg-white/15 hover:text-white whitespace-nowrap";
@@ -47,7 +48,7 @@ export function Navbar() {
         className="flex shrink-0 items-center gap-4 text-lg font-black tracking-tight text-white md:text-xl"
       >
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 shadow-inner">
-          <img src="/halqapay.png" alt="HalqaPay logo" className="h-6 w-6 object-contain" />
+          <img src="/halqapay.png" alt={t("nav.logoAlt")} className="h-6 w-6 object-contain" />
         </div>
         {!compact && <span>HalqaPay</span>}
       </Link>
@@ -116,6 +117,11 @@ export function Navbar() {
         >
           <span className="material-symbols-outlined text-[20px]">mail</span>
         </NavLink>
+        {token && (
+          <div className="flex items-center justify-center">
+            <NotificationInbox />
+          </div>
+        )}
         {user && !compact && (
           <div className="hidden text-end text-sm sm:block">
             <div className="font-bold text-white leading-none mb-1">{user.fullName}</div>
@@ -133,7 +139,7 @@ export function Navbar() {
             onClick={() => void signOut()}
             className={`btn-ieee rounded-full border border-white/25 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white transition-all hover:bg-white/15 ${compact ? "px-2 py-1" : ""}`}
           >
-            {compact ? "X" : t("nav.logout")}
+            {compact ? t("nav.logoutCompact") : t("nav.logout")}
           </button>
         ) : (
           <div className="flex items-center gap-4">
@@ -147,7 +153,7 @@ export function Navbar() {
               to="/register"
               className={`btn-ieee rounded-full bg-accent px-5 py-2 text-sm font-bold text-primary shadow-sm hover:brightness-105 ${compact ? "px-5 py-1.5" : ""}`}
             >
-              {compact ? t("nav.getStarted").split(" ")[0] : t("nav.getStarted")}
+              {compact ? t("nav.getStartedCompact") : t("nav.getStarted")}
             </Link>
           </div>
         )}

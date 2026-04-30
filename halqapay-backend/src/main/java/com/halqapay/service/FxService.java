@@ -21,21 +21,19 @@ public class FxService {
             return amount;
         }
 
-        // Standardize to USD first
-        BigDecimal rateToUsd = getRate(from, CurrencyCode.USD);
-        BigDecimal amountInUsd = amount.multiply(rateToUsd);
+        BigDecimal rateFrom = getRateToUsd(from);
+        BigDecimal rateTo = getRateToUsd(to);
 
-        // Then to target currency
-        BigDecimal rateFromUsd = getRate(CurrencyCode.USD, to);
-        
-        return amountInUsd.multiply(rateFromUsd).setScale(2, RoundingMode.HALF_UP);
+        // amount * rateFrom = amountInUsd
+        // amountInUsd / rateTo = amountInTo
+        return amount.multiply(rateFrom).divide(rateTo, 2, RoundingMode.HALF_UP);
     }
 
-    private BigDecimal getRate(CurrencyCode from, CurrencyCode to) {
-        if (from == to) return BigDecimal.ONE;
+    private BigDecimal getRateToUsd(CurrencyCode currency) {
+        if (currency == CurrencyCode.USD) return BigDecimal.ONE;
         
-        return fxRateRepository.findByFromCurrencyAndToCurrency(from, to)
+        return fxRateRepository.findByFromCurrencyAndToCurrency(currency, CurrencyCode.USD)
                 .map(FxRateEntity::getRate)
-                .orElseThrow(() -> new RuntimeException("Exchange rate not found for " + from + " to " + to));
+                .orElseThrow(() -> new RuntimeException("Exchange rate to USD not found for " + currency));
     }
 }

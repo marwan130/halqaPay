@@ -8,7 +8,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import com.halqapay.users.UserEntity;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -50,6 +53,25 @@ public class CircleEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false, columnDefinition = "circle_status")
     private CircleStatus status;
+
+    @Column
+    private String description;
+
+    @Column(name = "is_private", nullable = false)
+    private boolean isPrivate = false;
+
+    @Column(name = "monthly_contribution", insertable = false, updatable = false)
+    private BigDecimal monthlyContribution;
+
+    @Column(name = "invite_code", unique = true)
+    private String inviteCode;
+
+    @Column(name = "min_participants")
+    private Integer minParticipants;
+
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private UserEntity creator;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -127,6 +149,54 @@ public class CircleEntity {
 
     public void setStatus(CircleStatus status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
+
+    public BigDecimal getMonthlyContribution() {
+        return monthlyContribution;
+    }
+
+    public void setMonthlyContribution(BigDecimal monthlyContribution) {
+        this.monthlyContribution = monthlyContribution;
+    }
+
+    public Integer getMinParticipants() {
+        return minParticipants;
+    }
+
+    public void setMinParticipants(Integer minParticipants) {
+        this.minParticipants = minParticipants;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
+
+    public UserEntity getCreator() {
+        return creator;
+    }
+
+    public void setCreator(UserEntity creator) {
+        this.creator = creator;
     }
 
     public OffsetDateTime getCreatedAt() {

@@ -136,3 +136,21 @@ body {
 .navbar-pill-morph {
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.28s cubic-bezier(0.34, 1, 0.64, 1) both;
+}

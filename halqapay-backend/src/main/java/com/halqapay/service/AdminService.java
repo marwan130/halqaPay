@@ -19,17 +19,82 @@ public class AdminService {
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
     private final MonthlyCycleRepository cycleRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public AdminService(CircleRepository circleRepository,
                         CircleMembershipRepository membershipRepository,
                         UserRepository userRepository,
                         TransactionRepository transactionRepository,
-                        MonthlyCycleRepository cycleRepository) {
+                        MonthlyCycleRepository cycleRepository,
+                        org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.circleRepository = circleRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
         this.cycleRepository = cycleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    public void seedDemoData() {
+        // 1. Create Demo Users
+        createUser("Alice Smith", "alice@example.com", "USD", new BigDecimal("5000"));
+        createUser("Bob Jones", "bob@example.com", "USD", new BigDecimal("4500"));
+        createUser("Charlie Brown", "charlie@example.com", "USD", new BigDecimal("6000"));
+        createUser("Diana Prince", "diana@example.com", "USD", new BigDecimal("5500"));
+
+        UserEntity alice = userRepository.findByEmailIgnoreCase("alice@example.com").get();
+        UserEntity bob = userRepository.findByEmailIgnoreCase("bob@example.com").get();
+        UserEntity charlie = userRepository.findByEmailIgnoreCase("charlie@example.com").get();
+        UserEntity diana = userRepository.findByEmailIgnoreCase("diana@example.com").get();
+
+        // 2. Create a Demo Circle
+        CircleEntity circle = new CircleEntity();
+        circle.setName("Tech Savings 2024");
+        circle.setDescription("A group for tech enthusiasts to save for gadgets.");
+        circle.setCurrency(com.halqapay.users.CurrencyCode.USD);
+        circle.setTotalValue(new BigDecimal("4000"));
+        circle.setDurationMonths(4);
+        circle.setMonthlyContribution(new BigDecimal("1000"));
+        circle.setMinParticipants(4);
+        circle.setMaxMembers(4);
+        circle.setCreator(alice);
+        circle.setStatus(CircleStatus.ACTIVE);
+        circle.setCurrentMonth(1);
+        circle = circleRepository.save(circle);
+
+        // 3. Add Members
+        addMember(circle, alice, 1);
+        addMember(circle, bob, 2);
+        addMember(circle, charlie, 3);
+        addMember(circle, diana, 4);
+    }
+
+    private void createUser(String name, String email, String currency, BigDecimal salary) {
+        if (userRepository.existsByEmailIgnoreCase(email)) return;
+        UserEntity user = new UserEntity();
+        user.setId(UUID.randomUUID());
+        user.setFullName(name);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setCurrency(com.halqapay.users.CurrencyCode.valueOf(currency));
+        user.setSalary(salary);
+        user.setWalletBalance(new BigDecimal("2000")); // Start with some money
+        user.setRole(com.halqapay.users.UserRole.USER);
+        user.setKycStatus(com.halqapay.users.KycStatus.VERIFIED);
+        user.setCountry("USA");
+        user.setRiskScore(80);
+        userRepository.save(user);
+    }
+
+    private void addMember(CircleEntity circle, UserEntity user, int slot) {
+        CircleMembershipEntity membership = new CircleMembershipEntity();
+        membership.setCircle(circle);
+        membership.setUser(user);
+        membership.setSlotNumber(slot);
+        membership.setStatus(MembershipStatus.ACTIVE);
+        membership.setJoinedAt(java.time.OffsetDateTime.now());
+        membershipRepository.save(membership);
     }
 
     @Transactional
@@ -65,7 +130,7 @@ public class AdminService {
             tx.setUser(user);
             tx.setCircle(circle);
             tx.setType(TransactionType.CONTRIBUTION);
-            tx.setAmount(monthlyContribution.negate());
+            tx.setAmount(monthlyContribution);
             tx.setCurrency(circle.getCurrency());
             tx.setStatus(TransactionStatus.COMPLETED);
             tx.setMonthNumber(month);

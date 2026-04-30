@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { CircleJoinOrValidateResponse } from "../types";
+import i18n from "../i18n";
 
 export function getApiErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
@@ -11,7 +12,7 @@ export function getApiErrorMessage(err: unknown): string {
     if (err.message) return err.message;
   }
   if (err instanceof Error) return err.message;
-  return "Something went wrong.";
+  return i18n.t("common.error");
 }
 
 export function parseJoinOrValidateFromError(

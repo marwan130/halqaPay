@@ -41,7 +41,7 @@ public class CircleMembershipEntity {
     @Column(nullable = false, columnDefinition = "membership_status")
     private MembershipStatus status;
 
-    @Column(name = "joined_at", insertable = false, updatable = false)
+    @Column(name = "joined_at")
     private OffsetDateTime joinedAt;
 
     public UUID getId() {
@@ -86,5 +86,9 @@ public class CircleMembershipEntity {
 
     public OffsetDateTime getJoinedAt() {
         return joinedAt;
+    }
+
+    public void setJoinedAt(OffsetDateTime joinedAt) {
+        this.joinedAt = joinedAt;
     }
 }

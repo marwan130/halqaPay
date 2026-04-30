@@ -1,13 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { ListCirclesParams } from "../api/circles";
+import * as circlesApi from "../api/circles";
 import * as usersApi from "../api/users";
 import { CircleList } from "../components/circles/CircleList";
 import { JoinCircleModal } from "../components/circles/JoinCircleModal";
 import { ErrorBanner } from "../components/shared/ErrorBanner";
 import { LoadingSpinner } from "../components/shared/LoadingSpinner";
+import { SuccessModal } from "../components/shared/SuccessModal";
 import { useCirclesList } from "../hooks/useCircles";
 import { getApiErrorMessage } from "../lib/apiError";
 import { useAuthStore } from "../store/authStore";
@@ -29,25 +31,48 @@ export function CirclesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const token = useAuthStore((s) => s.token);
+  const queryClient = useQueryClient();
+
+  const [modalCircle, setModalCircle] = useState<CircleResponse | null>(null);
+  const [inviteCode, setInviteCode] = useState("");
+  const [joinByCodeError, setJoinByCodeError] = useState<string | null>(null);
+  const [showJoinSuccess, setShowJoinSuccess] = useState(false);
+
+  const joinByCodeMutation = useMutation({
+    mutationFn: (code: string) => circlesApi.joinByCode(code),
+    onSuccess: (res) => {
+      if (res.approved) {
+        setShowJoinSuccess(true);
+        setInviteCode("");
+        setJoinByCodeError(null);
+        refetch();
+        queryClient.invalidateQueries({ queryKey: ["users", "me", "circles"] });
+      } else {
+        setJoinByCodeError(res.reason || "Unable to join circle");
+      }
+    },
+    onError: (err) => {
+      setJoinByCodeError(getApiErrorMessage(err));
+    }
+  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const codeFromUrl = searchParams.get("code");
+    if (codeFromUrl) {
+      const normalized = codeFromUrl.toUpperCase().trim();
+      setInviteCode(normalized);
+      setSearchParams({}, { replace: true });
+      if (token) {
+        setJoinByCodeError(null);
+        joinByCodeMutation.mutate(normalized);
+      }
+    }
+  }, []);
+
   const [currency, setCurrency] = useState("");
   const [minValue, setMinValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
-  const [modalCircle, setModalCircle] = useState<CircleResponse | null>(null);
-
-  // Fetch the user's own memberships so we can mark cards client-side
-  const myCirclesQuery = useQuery({
-    queryKey: ["users", "me", "circles"],
-    queryFn: usersApi.fetchMyCircles,
-    enabled: !!token
-  });
-
-  const joinedCircleIds = useMemo<Set<string>>(() => {
-    const all = [
-      ...(myCirclesQuery.data?.activeCircles ?? []),
-      ...(myCirclesQuery.data?.completedCircles ?? [])
-    ];
-    return new Set(all.map((m) => String(m.circleId)));
-  }, [myCirclesQuery.data]);
 
   function normalizeMoneyInput(value: string) {
     const n = Number(value);
@@ -65,6 +90,20 @@ export function CirclesPage() {
   const { data: circles, isLoading, isError, error, refetch } =
     useCirclesList(listParams);
 
+  const myCirclesQuery = useQuery({
+    queryKey: ["users", "me", "circles"],
+    queryFn: usersApi.fetchMyCircles,
+    enabled: !!token
+  });
+
+  const joinedCircleIds = useMemo<Set<string>>(() => {
+    const all = [
+      ...(myCirclesQuery.data?.activeCircles ?? []),
+      ...(myCirclesQuery.data?.completedCircles ?? [])
+    ];
+    return new Set(all.map((m) => String(m.circleId)));
+  }, [myCirclesQuery.data]);
+
   function handleJoinClick(circle: CircleResponse) {
     if (!token) {
       navigate("/login", { state: { from: "/circles" } });
@@ -73,6 +112,16 @@ export function CirclesPage() {
     setModalCircle(circle);
   }
 
+  function handleJoinByCodeSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!token) {
+      navigate("/login", { state: { from: "/circles" } });
+      return;
+    }
+    if (!inviteCode.trim()) return;
+    setJoinByCodeError(null);
+    joinByCodeMutation.mutate(inviteCode.trim());
+  }
 
   return (
     <main className="mx-auto max-w-containerMax px-gutter py-10">
@@ -87,12 +136,31 @@ export function CirclesPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {token ? (
-            <Link
-              to="/circles/new"
-              className="inline-flex rounded-lg bg-secondary-container px-4 py-2 text-sm font-bold text-on-secondary-container shadow-card hover:brightness-95"
-            >
-              {t("circles.create")}
-            </Link>
+            <div className="flex items-center gap-2">
+              <form onSubmit={handleJoinByCodeSubmit} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder={t("circles.enterCode")}
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  className="rounded-lg border border-outline-variant bg-surface-lowest px-3 py-2 text-sm font-bold text-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 w-32"
+                />
+                <button
+                  type="submit"
+                  disabled={joinByCodeMutation.isPending}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-on shadow-card hover:opacity-95 disabled:opacity-60"
+                >
+                  {joinByCodeMutation.isPending ? "..." : t("circles.join")}
+                </button>
+              </form>
+              <div className="h-6 w-px bg-outline-variant mx-1" />
+              <Link
+                to="/circles/new"
+                className="inline-flex rounded-lg bg-secondary-container px-4 py-2 text-sm font-bold text-on-secondary-container shadow-card hover:brightness-95"
+              >
+                {t("circles.create")}
+              </Link>
+            </div>
           ) : null}
           {!token ? (
             <p className="text-sm text-on-surface">
@@ -107,6 +175,13 @@ export function CirclesPage() {
             </p>
           ) : null}
         </div>
+        {joinByCodeError && (
+          <div className="mt-2 text-right">
+            <span className="text-xs font-bold text-error bg-error-container/10 px-3 py-1 rounded-full border border-error-container/20">
+              {joinByCodeError}
+            </span>
+          </div>
+        )}
       </div>
 
       <section className="mt-8 rounded-card border border-outline-variant bg-surface-lowest p-5 shadow-card">
@@ -206,6 +281,15 @@ export function CirclesPage() {
         open={Boolean(modalCircle)}
         onClose={() => setModalCircle(null)}
         onSuccess={() => refetch()}
+      />
+
+      <SuccessModal
+        open={showJoinSuccess}
+        onClose={() => setShowJoinSuccess(false)}
+        title={t("circles.joinSuccessTitle")}
+        message={t("circles.joinSuccessMessage")}
+        actionLabel={t("circles.goToDashboard")}
+        onAction={() => navigate("/dashboard")}
       />
     </main>
   );

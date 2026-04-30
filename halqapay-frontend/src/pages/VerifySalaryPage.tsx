@@ -41,7 +41,7 @@ export function VerifySalaryPage() {
             required
             value={docUrl}
             onChange={(e) => setDocUrl(e.target.value)}
-            placeholder="https://example.com/my-salary-slip.pdf"
+            placeholder={t("kyc.placeholderUrl")}
             className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-lowest px-4 py-3 focus:border-primary focus:outline-none"
           />
           <p className="mt-4 text-xs text-on-surface-variant leading-relaxed">
