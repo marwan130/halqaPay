@@ -4,10 +4,12 @@ import { CurrencyDisplay } from "../shared/CurrencyDisplay";
 
 export function CircleCard({
   circle,
-  onJoin
+  onJoin,
+  isJoined = false
 }: {
   circle: CircleResponse;
   onJoin: (circle: CircleResponse) => void;
+  isJoined?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith("ar") ? "ar-EG" : "en-US";
@@ -20,9 +22,17 @@ export function CircleCard({
             savings
           </span>
         </div>
-        <span className="rounded-full bg-surface-high px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
-          {circle.status}
-        </span>
+        <div className="flex gap-2">
+          {circle.isAffordable && (
+            <span className="flex items-center gap-1 rounded-full bg-success-container px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-success-on border border-success/20">
+              <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+              {t("circles.card.affordable")}
+            </span>
+          )}
+          <span className="rounded-full bg-surface-high px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+            {circle.status}
+          </span>
+        </div>
       </div>
       <h3 className="text-xl font-bold text-primary">{circle.name}</h3>
       <dl className="mt-4 space-y-3 text-sm">
@@ -70,14 +80,21 @@ export function CircleCard({
           }}
         />
       </div>
-      <button
-        type="button"
-        onClick={() => onJoin(circle)}
-        disabled={slotsLeft === 0 || circle.status !== "OPEN"}
-        className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-on shadow-card transition-all hover:opacity-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {t("circles.card.join")}
-      </button>
+      {isJoined ? (
+        <div className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-success-container/10 p-3.5 text-sm font-black text-success border border-success/20">
+          <span className="material-symbols-outlined text-lg">check_circle</span>
+          {t("circles.card.alreadyJoined", "Membership Confirmed")}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => onJoin(circle)}
+          disabled={slotsLeft === 0 || circle.status !== "OPEN"}
+          className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-black text-primary-on shadow-card transition-all hover:scale-[1.01] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {t("circles.card.join")}
+        </button>
+      )}
     </article>
   );
 }

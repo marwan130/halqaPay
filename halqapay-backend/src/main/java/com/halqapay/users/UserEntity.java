@@ -46,6 +46,19 @@ public class UserEntity {
     @Column(name = "wallet_balance", nullable = false)
     private BigDecimal walletBalance;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(nullable = false, columnDefinition = "user_role")
+    private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "kyc_status", nullable = false, columnDefinition = "kyc_status")
+    private KycStatus kycStatus;
+
+    @Column(name = "kyc_document_url")
+    private String kycDocumentUrl;
+
     @Column(name = "risk_score", nullable = false)
     private Integer riskScore;
 
@@ -125,6 +138,30 @@ public class UserEntity {
 
     public void setWalletBalance(BigDecimal walletBalance) {
         this.walletBalance = walletBalance;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public KycStatus getKycStatus() {
+        return kycStatus;
+    }
+
+    public void setKycStatus(KycStatus kycStatus) {
+        this.kycStatus = kycStatus;
+    }
+
+    public String getKycDocumentUrl() {
+        return kycDocumentUrl;
+    }
+
+    public void setKycDocumentUrl(String kycDocumentUrl) {
+        this.kycDocumentUrl = kycDocumentUrl;
     }
 
     public Integer getRiskScore() {

@@ -53,6 +53,8 @@ public class AuthService {
         user.setSalary(request.salary());
         user.setWalletBalance(BigDecimal.ZERO);
         user.setRiskScore(750);
+        user.setRole(com.halqapay.users.UserRole.USER);
+        user.setKycStatus(com.halqapay.users.KycStatus.VERIFIED);
 
         UserEntity saved = userRepository.save(user);
         String token = jwtService.generateToken(saved.getId(), saved.getEmail());

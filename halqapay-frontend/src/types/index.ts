@@ -14,6 +14,9 @@ export type CircleStatus = "OPEN" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type TransactionType = "CONTRIBUTION" | "PAYOUT" | "REFUND";
 export type TransactionStatus = "PENDING" | "COMPLETED" | "FAILED";
 
+export type KycStatus = "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
+export type UserRole = "USER" | "ADMIN";
+
 export interface UserSummary {
   id: string;
   email: string;
@@ -21,6 +24,8 @@ export interface UserSummary {
   salary: string;
   walletBalance: string;
   currency: CurrencyCode;
+  kycStatus?: KycStatus;
+  role?: UserRole;
 }
 
 export interface AuthResponse {
@@ -54,6 +59,8 @@ export interface CircleResponse {
   currentMembers: number;
   currentMonth: number;
   status: CircleStatus;
+  isAffordable?: boolean;
+  isJoined?: boolean;
 }
 
 export interface CirclesListResponse {
@@ -92,6 +99,9 @@ export interface UserProfileResponse {
   salary: string | number;
   walletBalance: string | number;
   riskScore: number;
+  kycStatus: KycStatus;
+  role: UserRole;
+  kycDocumentUrl?: string;
   activeCircles?: MyCircleMembershipSummary[];
 }
 
@@ -145,4 +155,5 @@ export interface ActiveCircleRow {
   currency: CurrencyCode;
   monthsRemaining: number;
   payoutStatus: string;
+  circleStatus?: string;
 }

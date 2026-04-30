@@ -4,10 +4,12 @@ import { CircleCard } from "./CircleCard";
 
 export function CircleList({
   circles,
-  onJoin
+  onJoin,
+  joinedCircleIds = new Set()
 }: {
   circles: CircleResponse[];
   onJoin: (circle: CircleResponse) => void;
+  joinedCircleIds?: Set<string>;
 }) {
   const { t } = useTranslation();
   if (circles.length === 0) {
@@ -20,7 +22,12 @@ export function CircleList({
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {circles.map((c) => (
-        <CircleCard key={c.id} circle={c} onJoin={onJoin} />
+        <CircleCard
+          key={c.id}
+          circle={c}
+          onJoin={onJoin}
+          isJoined={joinedCircleIds.has(String(c.id))}
+        />
       ))}
     </div>
   );

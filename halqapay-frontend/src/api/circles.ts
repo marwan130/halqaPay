@@ -17,8 +17,8 @@ export interface ListCirclesParams {
 export async function fetchCircles(
   params?: ListCirclesParams
 ): Promise<CircleResponse[]> {
-  const { data } = await api.get<CirclesListResponse>("/circles", { params });
-  return data.circles ?? [];
+  const { data } = await api.get<CircleResponse[]>("/circles", { params });
+  return data;
 }
 
 export async function fetchCircle(id: string): Promise<CircleResponse> {
@@ -51,4 +51,8 @@ export async function joinCircle(
     `/circles/${circleId}/join`
   );
   return data;
+}
+
+export async function leaveCircle(circleId: string): Promise<void> {
+  await api.delete(`/circles/${circleId}/leave`);
 }

@@ -8,6 +8,7 @@ public record UserProfileResponse(
         CurrencyCode currency,
         String salary,
         String walletBalance,
-        int riskScore
+        int riskScore,
+        KycStatus kycStatus
 ) {
 }

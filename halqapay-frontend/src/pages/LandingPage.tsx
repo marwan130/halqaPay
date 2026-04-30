@@ -1,174 +1,249 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/authStore";
+import { useState } from "react";
 
 export function LandingPage() {
   const { t } = useTranslation();
   const token = useAuthStore((s) => s.token);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const pillars = [
+    { title: t("landing.pillar1Title"), body: t("landing.pillar1Body"), icon: "account_balance" },
+    { title: t("landing.pillar2Title"), body: t("landing.pillar2Body"), icon: "group_off" },
+    { title: t("landing.pillar3Title"), body: t("landing.pillar3Body"), icon: "trending_up" }
+  ];
+
+  const features = [
+    { title: t("landing.features.p1Title"), body: t("landing.features.p1Body"), icon: "auto_mode" },
+    { title: t("landing.features.p2Title"), body: t("landing.features.p2Body"), icon: "verified" },
+    { title: t("landing.features.p3Title"), body: t("landing.features.p3Body"), icon: "published_with_changes" },
+    { title: t("landing.features.p4Title"), body: t("landing.features.p4Body"), icon: "account_balance_wallet" }
+  ];
 
   const steps = [
-    {
-      title: t("landing.step1Title"),
-      body: t("landing.step1Body"),
-      icon: "person_add"
-    },
-    {
-      title: t("landing.step2Title"),
-      body: t("landing.step2Body"),
-      icon: "search"
-    },
-    {
-      title: t("landing.step3Title"),
-      body: t("landing.step3Body"),
-      icon: "task_alt"
-    },
-    {
-      title: t("landing.step4Title"),
-      body: t("landing.step4Body"),
-      icon: "payments"
-    }
+    { title: t("landing.step1Title"), body: t("landing.step1Body"), icon: "person_add" },
+    { title: t("landing.step2Title"), body: t("landing.step2Body"), icon: "search" },
+    { title: t("landing.step3Title"), body: t("landing.step3Body"), icon: "task_alt" },
+    { title: t("landing.step4Title"), body: t("landing.step4Body"), icon: "payments" }
   ];
+
   const approachItems = [
-    {
-      title: t("landing.approach.transparencyTitle"),
-      body: t("landing.approach.transparencyBody"),
-      icon: "visibility"
-    },
-    {
-      title: t("landing.approach.eligibilityTitle"),
-      body: t("landing.approach.eligibilityBody"),
-      icon: "query_stats"
-    },
-    {
-      title: t("landing.approach.automationTitle"),
-      body: t("landing.approach.automationBody"),
-      icon: "autorenew"
-    }
+    { title: t("landing.approach.transparencyTitle"), body: t("landing.approach.transparencyBody"), icon: "visibility" },
+    { title: t("landing.approach.eligibilityTitle"), body: t("landing.approach.eligibilityBody"), icon: "fact_check" },
+    { title: t("landing.approach.automationTitle"), body: t("landing.approach.automationBody"), icon: "auto_mode" }
   ];
-  const rightsItems = [
-    t("landing.rights.item1"),
-    t("landing.rights.item2"),
-    t("landing.rights.item3")
+
+  const forWhom = [
+    { title: t("landing.forWhom.indivTitle"), body: t("landing.forWhom.indivBody"), icon: "person" },
+    { title: t("landing.forWhom.groupTitle"), body: t("landing.forWhom.groupBody"), icon: "groups" }
   ];
 
   return (
-    <div className="bg-transparent">
-      <section className="landing-hero-bg relative -mt-20 overflow-hidden border-b border-outline-variant/70 bg-transparent px-gutter pb-16 pt-28 md:px-10 md:pb-20 md:pt-32">
-        <div className="pointer-events-none absolute -top-24 -start-24 h-64 w-64 rounded-full bg-secondary-container/30 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -end-16 h-72 w-72 rounded-full bg-primary-fixed/40 blur-3xl" />
-        <div className="relative z-10 mx-auto grid max-w-containerMax grid-cols-1 items-center gap-stack-lg md:grid-cols-2 md:pt-6">
-          <div className="space-y-stack-md">
-            <div className="inline-flex items-center gap-2 rounded-full bg-secondary-container/80 px-3 py-1 text-primary shadow-sm backdrop-blur-sm">
-              <span
-                className="material-symbols-outlined text-base"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                verified
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider">
-                {t("landing.badge")}
-              </span>
+    <div className="bg-transparent font-sans">
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden px-gutter pb-24 pt-16 md:pt-32">
+        <div className="mx-auto grid max-w-containerMax grid-cols-1 items-center gap-16 lg:grid-cols-2">
+          <div className="reveal space-y-10 text-left">
+            <div className="hp-pill inline-flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+              <span className="text-xs font-black uppercase tracking-widest">{t("landing.badge")}</span>
             </div>
-            <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-primary md:text-5xl">
-              {t("landing.heroTitle")}{" "}
+            <h1 className="text-6xl font-black leading-[1] tracking-tighter text-primary md:text-8xl">
+              {t("landing.heroTitle")}
             </h1>
-            <p className="max-w-md text-lg leading-relaxed text-on-surface-variant">
+            <p className="max-w-xl text-2xl leading-relaxed text-primary font-medium opacity-90">
               {t("landing.heroSubtitle")}
             </p>
-            <div className="flex flex-col gap-4 pt-2 sm:flex-row">
+            <div className="flex flex-col gap-5 pt-8 sm:flex-row">
               {token ? (
-                <Link
-                  to="/dashboard"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-primary px-8 py-3 text-center text-sm font-bold text-primary-on shadow-card transition-transform active:scale-[0.98]"
-                >
+                <Link to="/dashboard" className="btn-ieee inline-flex min-h-[72px] items-center justify-center rounded-[2rem] bg-primary px-14 py-6 text-center text-2xl font-black text-white shadow-2xl active:scale-95">
                   {t("landing.ctaDashboard")}
                 </Link>
               ) : (
-                <Link
-                  to="/register"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-primary px-8 py-3 text-center text-sm font-bold text-primary-on shadow-card transition-transform active:scale-[0.98]"
-                >
+                <Link to="/register" className="btn-ieee inline-flex min-h-[72px] items-center justify-center rounded-[2rem] bg-primary px-14 py-6 text-center text-2xl font-black text-white shadow-2xl active:scale-95">
                   {t("landing.ctaStart")}
                 </Link>
               )}
-              <Link
-                to="/how-it-works"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-lg border-2 border-primary px-8 py-3 text-center text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-secondary-container"
-              >
+              <Link to="/how-it-works" className="btn-ieee hp-glass-card inline-flex min-h-[72px] items-center justify-center rounded-[2rem] px-14 py-6 text-center text-2xl font-black text-primary transition-all hover:bg-slate-50">
                 {t("landing.ctaLearn")}
               </Link>
             </div>
           </div>
-          <div className="relative mt-10 md:mt-0">
-            <div className="hero-gradient hero-card-image relative overflow-hidden rounded-3xl shadow-cardLg">
-              <div className="aspect-[4/5] p-8 text-primary-on md:aspect-square">
-                <p className="text-sm font-bold opacity-80">HalqaPay</p>
-                <p className="mt-6 text-2xl font-black leading-snug">{t("landing.frameworkTitle")}</p>
+
+          <div className="reveal reveal-right relative group">
+            {/* HERO IMAGE */}
+            <div className="rounded-[4rem] shadow-2xl transition-all duration-700 hover:-translate-y-2 hover:shadow-[0_80px_150px_-30px_rgba(0,38,69,0.5)] overflow-hidden">
+              <div className="image-ieee-container bg-primary/95 relative z-10 aspect-square">
+                <img
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200"
+                  className="h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-100"
+                />
+                <div className="absolute inset-0 bg-primary/20 pointer-events-none" />
+                <div className="absolute inset-0 p-12 text-white pointer-events-none flex flex-col justify-end">
+                  <div className="reveal space-y-2">
+                    <p className="text-xl font-bold opacity-80 tracking-wide uppercase text-xs">HalqaPay Platform</p>
+                    <p className="text-4xl font-black leading-tight tracking-tight">{t("landing.frameworkTitle")}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-transparent py-20">
+      {/* PILLARS SECTION */}
+      <section className="relative overflow-hidden py-32 bg-white border-y border-slate-100">
         <div className="mx-auto max-w-containerMax px-gutter">
-          <div className="mb-12 space-y-4 text-center">
-            <h2 className="text-3xl font-bold text-primary md:text-4xl">
-              {t("landing.frameworkTitle")}
-            </h2>
-            <p className="mx-auto max-w-2xl text-on-surface-variant">
-              {t("landing.frameworkSubtitle")}
-            </p>
+          <div className="reveal mb-20 text-center">
+            <h2 className="text-5xl font-black text-primary md:text-6xl">{t("landing.whyTitle")}</h2>
+            <p className="mt-6 text-2xl text-primary font-bold">{t("landing.whySubtitle")}</p>
           </div>
-          <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">
-            {steps.map((s) => (
-              <div
-                key={s.title}
-                className="landing-glass-card landing-glass-card-yellow flex flex-col items-center rounded-card border border-secondary-container/35 p-6 text-center shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-cardLg"
-              >
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-secondary-container">
-                  <span className="material-symbols-outlined text-3xl">{s.icon}</span>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+            {pillars.map((p, i) => (
+              <div key={i} style={{ "--reveal-delay": `${i * 150}ms` } as any} className="reveal reveal-up flex flex-col items-center text-center p-8">
+                <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-accent text-primary shadow-lg">
+                  <span className="material-symbols-outlined text-4xl">{p.icon}</span>
                 </div>
-                <h3 className="mb-3 text-lg font-bold text-primary">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-primary/85">
-                  {s.body}
-                </p>
+                <h3 className="mb-5 text-3xl font-black text-primary">{p.title}</h3>
+                <p className="text-xl text-primary leading-relaxed font-bold opacity-80">{p.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-t border-outline-variant/70 bg-transparent py-16">
-        <div className="mx-auto grid max-w-containerMax grid-cols-1 gap-8 px-gutter lg:grid-cols-2">
-          <article className="landing-glass-card landing-glass-card-blue rounded-card border border-transparent p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-cardLg">
-            <h3 className="text-2xl font-bold text-secondary-container">{t("landing.platformTitle")}</h3>
-            <p className="mt-4 leading-relaxed text-secondary-container/85">{t("landing.platformBody")}</p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-                <p className="text-xs font-bold uppercase tracking-wider text-secondary-container/80">
-                  {t("landing.metrics.membersLabel")}
-                </p>
-                <p className="mt-1 text-xl font-black text-secondary-container">{t("landing.metrics.membersValue")}</p>
+      {/* FEATURES SECTION */}
+      <section className="relative overflow-hidden py-40">
+        <div className="mx-auto max-w-containerMax px-gutter">
+          <div className="reveal mb-24 text-center">
+            <h2 className="text-6xl font-black text-primary md:text-7xl">{t("landing.features.title")}</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((f, i) => (
+              <div key={i} style={{ "--reveal-delay": `${i * 120}ms` } as any} className="reveal reveal-up group hp-glass-card p-12 text-left rounded-[3rem]">
+                <div className="mb-10 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-white transition-transform group-hover:scale-110 shadow-lg">
+                  <span className="material-symbols-outlined text-4xl">{f.icon}</span>
+                </div>
+                <h3 className="mb-5 text-2xl font-black text-primary leading-tight">{f.title}</h3>
+                <p className="text-primary leading-relaxed text-lg font-bold opacity-80">{f.body}</p>
               </div>
-              <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-                <p className="text-xs font-bold uppercase tracking-wider text-secondary-container/80">
-                  {t("landing.metrics.payoutLabel")}
-                </p>
-                <p className="mt-1 text-xl font-black text-secondary-container">{t("landing.metrics.payoutValue")}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SHOWCASE SECTION */}
+      <section className="relative py-24 px-gutter">
+        <div className="mx-auto max-w-containerMax relative overflow-hidden rounded-[4rem] shadow-2xl min-h-[500px] group flex items-center">
+          <div className="absolute inset-0 z-0">
+            <img
+              src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&q=80&w=2000"
+              alt="Platform Background"
+              className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-primary/75 backdrop-blur-[2px]" />
+          </div>
+
+          <div className="relative z-10 w-full px-10 py-20 lg:px-24">
+            <div className="reveal space-y-10 text-white max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
+              <h2 className="text-6xl font-black md:text-7xl leading-[1.1]">{t("landing.showcaseTitle")}</h2>
+              <p className="text-3xl font-bold leading-relaxed opacity-90">{t("landing.showcaseSubtitle")}</p>
+              <div className="pt-6">
+                <Link to="/register" className="btn-ieee inline-flex items-center gap-4 bg-accent px-14 py-6 text-2xl font-black text-primary shadow-2xl transition-transform hover:scale-105 active:scale-95">
+                  {t("landing.browse")}
+                  <span className="material-symbols-outlined text-4xl">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SAVINGS CIRCLES SECTION */}
+      <section className="relative py-32 px-gutter">
+        <div className="mx-auto max-w-containerMax relative overflow-hidden rounded-[4rem] px-10 py-24 shadow-2xl lg:px-24 group min-h-[600px] bg-white/10 backdrop-blur-xl border border-white/20 transition-all duration-700 hover:bg-white/15 hover:-translate-y-2">
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <img
+              src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=2000"
+              alt="Community Savings"
+              className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80"
+            />
+            <div className="absolute inset-0 bg-primary/60" />
+          </div>
+
+          <div className="reveal mb-24 text-center relative z-10">
+            <h2 className="text-6xl font-black text-white md:text-7xl">{t("landing.frameworkTitle")}</h2>
+            <p className="mt-8 text-3xl text-white font-bold opacity-80">{t("landing.frameworkSubtitle")}</p>
+          </div>
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 relative z-10">
+            {steps.map((s, i) => (
+              <div key={i} style={{ "--reveal-delay": `${i * 150}ms` } as any} className="reveal reveal-up group bg-white/15 backdrop-blur-xl p-12 rounded-[3.5rem] border border-white/30 shadow-2xl transition-all hover:bg-white/25">
+                <div className="absolute -top-8 -left-8 flex h-16 w-16 items-center justify-center rounded-3xl bg-accent font-black text-primary shadow-2xl border-4 border-white">
+                  {i + 1}
+                </div>
+                <div className="mb-10 text-accent">
+                  <span className="material-symbols-outlined text-6xl">{s.icon}</span>
+                </div>
+                <h3 className="mb-5 text-3xl font-black text-white">{s.title}</h3>
+                <p className="text-xl leading-relaxed text-white font-bold opacity-80">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOR WHOM SECTION */}
+      <section className="relative overflow-hidden py-32 bg-primary/5">
+        <div className="mx-auto max-w-containerMax px-gutter">
+          <div className="reveal mb-20 text-center">
+            <h2 className="text-5xl font-black text-primary md:text-6xl">{t("landing.forWhom.title")}</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+            {forWhom.map((item, i) => (
+              <div key={i} style={{ "--reveal-delay": `${i * 150}ms` } as any} className="reveal reveal-up hp-glass-card p-12 rounded-[3.5rem] flex items-center gap-10 border-white shadow-xl">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[2.5rem] bg-primary text-accent shadow-xl">
+                  <span className="material-symbols-outlined text-5xl">{item.icon}</span>
+                </div>
+                <div>
+                  <h3 className="mb-4 text-3xl font-black text-primary">{item.title}</h3>
+                  <p className="text-xl text-primary leading-relaxed font-bold opacity-80">{item.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ARTICLES SECTION */}
+      <section className="border-t border-slate-200 bg-transparent py-40">
+        <div className="mx-auto grid max-w-containerMax grid-cols-1 gap-12 px-gutter lg:grid-cols-2">
+          {/* ARTICLE 1 */}
+          <article className="reveal reveal-left hp-glass-primary p-12 shadow-[0_32px_64px_-16px_rgba(0,38,69,0.4)] rounded-[3.5rem]">
+            <h3 className="text-4xl font-black text-accent leading-tight">{t("landing.platformTitle")}</h3>
+            <p className="mt-8 text-2xl leading-relaxed text-white font-bold opacity-90">{t("landing.platformBody")}</p>
+            <div className="mt-12 grid gap-6 sm:grid-cols-2">
+              <div className="rounded-[2rem] bg-white/10 p-8 border border-white/10">
+                <p className="text-xs font-black uppercase tracking-widest text-accent">{t("landing.metrics.membersLabel")}</p>
+                <p className="mt-3 text-2xl font-black text-white">{t("landing.metrics.membersValue")}</p>
+              </div>
+              <div className="rounded-[2rem] bg-white/10 p-8 border border-white/10">
+                <p className="text-xs font-black uppercase tracking-widest text-accent">{t("landing.metrics.payoutLabel")}</p>
+                <p className="mt-3 text-2xl font-black text-white">{t("landing.metrics.payoutValue")}</p>
               </div>
             </div>
           </article>
 
-          <article className="landing-glass-card landing-glass-card-yellow rounded-card border border-secondary-container/35 p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-cardLg">
-            <h3 className="text-2xl font-bold text-primary">{t("landing.approach.title")}</h3>
-            <div className="mt-5 space-y-4">
-              {approachItems.map((item) => (
-                <div key={item.title} className="flex items-start gap-3 rounded-xl bg-white/45 p-4 backdrop-blur-sm transition-colors hover:bg-white/65">
-                  <span className="material-symbols-outlined mt-0.5 text-primary">{item.icon}</span>
+          {/* ARTICLE 2 */}
+          <article className="reveal reveal-right hp-glass-card p-12 shadow-xl rounded-[3.5rem] border-accent/20">
+            <h3 className="text-4xl font-black text-primary leading-tight">{t("landing.approach.title")}</h3>
+            <div className="mt-10 space-y-6">
+              {approachItems.map((item, i) => (
+                <div key={i} style={{ "--reveal-delay": `${i * 120}ms` } as any} className="reveal reveal-up flex items-start gap-6 rounded-[2.5rem] bg-slate-50 p-8 transition-all hover:bg-slate-100">
+                  <span className="material-symbols-outlined mt-1 text-primary text-4xl">{item.icon}</span>
                   <div>
-                    <p className="font-bold text-primary">{item.title}</p>
-                    <p className="mt-1 text-sm text-primary/85">{item.body}</p>
+                    <p className="text-2xl font-black text-primary leading-tight">{item.title}</p>
+                    <p className="mt-3 text-lg text-primary font-bold opacity-80 leading-relaxed">{item.body}</p>
                   </div>
                 </div>
               ))}
@@ -177,33 +252,55 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="border-t border-outline-variant/70 bg-transparent py-14">
+      {/* RIGHTS SECTION */}
+      <section className="relative border-t border-slate-200 py-32 bg-white">
         <div className="mx-auto max-w-containerMax px-gutter">
-          <div className="landing-glass-card rounded-2xl border border-primary-container/30 bg-white/55 p-7 shadow-card backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-cardLg">
-            <h3 className="text-2xl font-bold text-primary">{t("landing.rights.title")}</h3>
-            <p className="mt-3 leading-relaxed text-on-surface-variant">{t("landing.rights.subtitle")}</p>
-            <ul className="mt-5 space-y-3">
-              {rightsItems.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-on-surface">
-                  <span className="material-symbols-outlined text-base text-secondary">check_circle</span>
-                  <span>{item}</span>
+          <div className="reveal reveal-scale hp-glass-card rounded-[4rem] p-16 shadow-2xl border-slate-100">
+            <h3 className="text-5xl font-black text-primary leading-tight">{t("landing.rights.title")}</h3>
+            <p className="mt-6 text-2xl text-primary font-bold opacity-80 leading-relaxed max-w-4xl">{t("landing.rights.subtitle")}</p>
+            <ul className="mt-12 grid gap-6 md:grid-cols-3">
+              {[1, 2, 3].map((n) => (
+                <li key={n} style={{ "--reveal-delay": `${n * 120}ms` } as any} className="reveal reveal-up flex items-start gap-4 text-xl font-bold text-primary bg-slate-50 p-8 rounded-[2.5rem]">
+                  <span className="material-symbols-outlined text-accent text-3xl">check_circle</span>
+                  <span>{t(`landing.rights.item${n}`)}</span>
                 </li>
               ))}
             </ul>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                to="/terms"
-                className="interactive-link rounded-lg border border-outline-variant px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-secondary-container"
-              >
+            <div className="mt-16 flex flex-wrap gap-6">
+              <Link to="/terms" className="btn-ieee rounded-2xl bg-primary px-10 py-5 text-xl font-black text-white shadow-xl">
                 {t("landing.rights.readTerms")}
               </Link>
-              <Link
-                to="/privacy"
-                className="interactive-link rounded-lg border border-outline-variant px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-secondary-container"
-              >
+              <Link to="/privacy" className="btn-ieee rounded-2xl border-2 border-primary px-10 py-5 text-xl font-black text-primary hover:bg-slate-50">
                 {t("landing.rights.readPrivacy")}
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="relative py-40">
+        <div className="mx-auto max-w-4xl px-gutter text-center">
+          <h2 className="reveal mb-20 text-6xl font-black text-primary">{t("landing.faq.title")}</h2>
+          <div className="space-y-8 text-left">
+            {[1, 2, 3].map((i) => (
+              <div key={i} style={{ "--reveal-delay": `${i * 150}ms` } as any} className="reveal reveal-up overflow-hidden hp-glass-card rounded-[3rem] shadow-lg border-slate-100">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex w-full items-center justify-between p-10 text-left"
+                >
+                  <span className="text-2xl font-black text-primary leading-tight">{t(`landing.faq.q${i}`)}</span>
+                  <span className={`material-symbols-outlined text-primary/30 transition-transform text-5xl ${openFaq === i ? "rotate-180" : ""}`}>
+                    expand_more
+                  </span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openFaq === i ? "max-h-[600px]" : "max-h-0"}`}>
+                  <p className="border-t border-slate-100 p-10 text-2xl text-primary font-bold opacity-80 leading-relaxed">
+                    {t(`landing.faq.a${i}`)}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

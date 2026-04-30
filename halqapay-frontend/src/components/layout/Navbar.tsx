@@ -7,7 +7,7 @@ import { CurrencyDisplay } from "../shared/CurrencyDisplay";
 import { LanguageSwitcher } from "../shared/LanguageSwitcher";
 
 const linkClass =
-  "rounded-full px-3 py-2 text-sm font-semibold text-white/85 transition-colors hover:bg-white/15 hover:text-white";
+  "rounded-full px-2 py-2 text-sm font-semibold text-white/85 transition-colors hover:bg-white/15 hover:text-white whitespace-nowrap";
 const activeClass = "bg-white/20 text-white";
 
 export function Navbar() {
@@ -36,93 +36,118 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 mx-auto mt-2 flex w-[calc(100%-1.25rem)] max-w-containerMax items-center justify-between gap-3 rounded-full border px-4 text-primary-on shadow-cardLg backdrop-blur-md transition-all duration-300 md:px-7 ${
-        compact ? "h-12" : "h-16"
-      } ${
-        scrolled
+      className={`sticky top-0 z-50 mx-auto mt-2 flex w-max max-w-[calc(100%-1.25rem)] items-center justify-center gap-4 rounded-full border px-6 text-white shadow-cardLg backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-[width,transform] ${compact ? "h-11 translate-y-1 scale-95 opacity-95" : "h-16 translate-y-0 scale-100 opacity-100"
+        } ${scrolled
           ? "border-white/20 bg-primary/80"
           : "border-primary-container/30 bg-primary/90"
-      }`}
+        }`}
     >
-      <div className="flex min-w-0 items-center gap-6">
-        <Link
-          to="/"
-          className="flex shrink-0 items-center gap-2 text-lg font-black tracking-tight text-primary-on md:text-xl"
+      <Link
+        to="/"
+        className="flex shrink-0 items-center gap-4 text-lg font-black tracking-tight text-white md:text-xl"
+      >
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 shadow-inner">
+          <img src="/halqapay.png" alt="HalqaPay logo" className="h-6 w-6 object-contain" />
+        </div>
+        {!compact && <span>HalqaPay</span>}
+      </Link>
+
+      {!compact && (
+        <nav className="hidden items-center gap-4 md:flex">
+        {token && (
+          <>
+            <NavLink
+              to="/circles"
+              className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ""}`}
+            >
+              {t("nav.circles")}
+            </NavLink>
+            <NavLink
+              to="/circles/new"
+              className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ""}`}
+            >
+              {t("nav.newCircle")}
+            </NavLink>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? activeClass : ""}`
+              }
+            >
+              {t("nav.dashboard")}
+            </NavLink>
+            <NavLink
+              to="/transactions"
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? activeClass : ""}`
+              }
+            >
+              {t("nav.activity")}
+            </NavLink>
+          </>
+        )}
+        <NavLink
+          to="/how-it-works"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
         >
-          <img src="/halqapay.png" alt="HalqaPay logo" className="h-8 w-8 rounded-md object-contain" />
-          HalqaPay
-        </Link>
-        <nav className="hidden flex-wrap items-center gap-1 md:flex">
-          {token ? (
-            <>
-              <NavLink
-                to="/circles"
-                className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ""}`}
-              >
-                {t("nav.circles")}
-              </NavLink>
-              <NavLink
-                to="/circles/new"
-                className={({ isActive }) =>
-                  `${linkClass} ${isActive ? activeClass : ""}`
-                }
-              >
-                {t("nav.newCircle")}
-              </NavLink>
-              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  `${linkClass} ${isActive ? activeClass : ""}`
-                }
-              >
-                {t("nav.dashboard")}
-              </NavLink>
-              <NavLink
-                to="/transactions"
-                className={({ isActive }) =>
-                  `${linkClass} ${isActive ? activeClass : ""}`
-                }
-              >
-                {t("nav.activity")}
-              </NavLink>
-            </>
-          ) : null}
-        </nav>
-      </div>
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        <LanguageSwitcher />
-        {user ? (
+          {t("nav.howItWorks")}
+        </NavLink>
+        <NavLink
+          to="/about"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+        >
+          {t("nav.about")}
+        </NavLink>
+      </nav>
+      )}
+
+      <div className="flex shrink-0 items-center gap-4">
+        {!compact && <LanguageSwitcher />}
+        <NavLink
+          to="/contact"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""} flex items-center justify-center`
+          }
+          title={t("nav.contact")}
+        >
+          <span className="material-symbols-outlined text-[20px]">mail</span>
+        </NavLink>
+        {user && !compact && (
           <div className="hidden text-end text-sm sm:block">
-            <div className="font-bold text-white">{user.fullName}</div>
-            <div className="text-white/75">
+            <div className="font-bold text-white leading-none mb-1">{user.fullName}</div>
+            <div className="text-white/60 text-[10px] font-black uppercase tracking-widest">
               <CurrencyDisplay
                 amount={user.walletBalance}
                 currency={user.currency}
               />
             </div>
           </div>
-        ) : null}
+        )}
         {token ? (
           <button
             type="button"
             onClick={() => void signOut()}
-            className="rounded-full border border-white/25 px-3 py-2 text-sm font-bold text-white hover:bg-white/15"
+            className={`btn-ieee rounded-full border border-white/25 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white transition-all hover:bg-white/15 ${compact ? "px-2 py-1" : ""}`}
           >
-            {t("nav.logout")}
+            {compact ? "X" : t("nav.logout")}
           </button>
         ) : (
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-4">
             <Link
               to="/login"
-              className="rounded-full px-2 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 sm:px-3"
+              className={`rounded-full px-3 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 ${compact ? "hidden" : ""}`}
             >
               {t("nav.login")}
             </Link>
             <Link
               to="/register"
-              className="rounded-lg bg-secondary-container px-3 py-2 text-sm font-bold text-on-secondary-container shadow-sm hover:brightness-95"
+              className={`btn-ieee rounded-full bg-accent px-5 py-2 text-sm font-bold text-primary shadow-sm hover:brightness-105 ${compact ? "px-5 py-1.5" : ""}`}
             >
-              {t("nav.getStarted")}
+              {compact ? t("nav.getStarted").split(" ")[0] : t("nav.getStarted")}
             </Link>
           </div>
         )}

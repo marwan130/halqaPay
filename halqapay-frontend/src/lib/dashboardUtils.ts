@@ -50,7 +50,8 @@ export function mapMembershipsToActiveRows(
       monthlyAmount: monthly,
       currency,
       monthsRemaining,
-      payoutStatus
+      payoutStatus,
+      circleStatus: m.status
     };
   });
 }

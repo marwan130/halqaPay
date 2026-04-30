@@ -38,7 +38,18 @@ export default {
         accent: "#fed65b",
         danger: {
           DEFAULT: "#ba1a1a",
-          container: "#ffdad6"
+          container: "#ffdad6",
+          on: "#410002"
+        },
+        success: {
+          DEFAULT: "#006d3d",
+          container: "#97f7b7",
+          on: "#00210e"
+        },
+        warning: {
+          DEFAULT: "#765a00",
+          container: "#ffdf96",
+          on: "#251a00"
         }
       },
       maxWidth: {

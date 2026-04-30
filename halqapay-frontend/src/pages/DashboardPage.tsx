@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import * as usersApi from "../api/users";
+import * as circlesApi from "../api/circles";
 import { ActiveCircles } from "../components/dashboard/ActiveCircles";
 import { BurdenMeter } from "../components/dashboard/BurdenMeter";
+import { KycWidget } from "../components/dashboard/KycWidget";
 import { WalletCard } from "../components/dashboard/WalletCard";
 import { ErrorBanner } from "../components/shared/ErrorBanner";
 import { LoadingSpinner } from "../components/shared/LoadingSpinner";
@@ -17,6 +19,8 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const { patchUser } = useAuth();
+  const queryClient = useQueryClient();
+  const [leavingId, setLeavingId] = useState<string | null>(null);
 
   const profileQuery = useQuery({
     queryKey: ["users", "me"],
@@ -33,6 +37,19 @@ export function DashboardPage() {
       patchUser(usersApi.profileToUserSummary(profileQuery.data));
     }
   }, [profileQuery.data, patchUser]);
+
+  async function handleLeave(circleId: string) {
+    setLeavingId(circleId);
+    try {
+      await circlesApi.leaveCircle(circleId);
+      await queryClient.invalidateQueries({ queryKey: ["users", "me", "circles"] });
+      await queryClient.invalidateQueries({ queryKey: ["circles"] });
+    } catch (e) {
+      alert(getApiErrorMessage(e));
+    } finally {
+      setLeavingId(null);
+    }
+  }
 
   if (profileQuery.isLoading) {
     return (
@@ -67,8 +84,7 @@ export function DashboardPage() {
     );
   }
 
-  const activeFromApi =
-    circlesQuery.data?.activeCircles ?? profile.activeCircles ?? [];
+  const activeFromApi = circlesQuery.data?.activeCircles ?? [];
   const burden = computeBurdenPercent(profile, activeFromApi);
   const activeRows = mapMembershipsToActiveRows(activeFromApi, t);
   const displayName = profile.fullName ?? user?.fullName ?? "Member";
@@ -89,13 +105,26 @@ export function DashboardPage() {
           label={t("dashboard.wallet")}
         />
         <div className="lg:col-span-2">
+          <KycWidget status={profile.kycStatus} />
+        </div>
+        <div className="lg:col-span-2">
           <BurdenMeter usedPercent={burden} />
         </div>
         <div className="lg:col-span-2">
           {circlesQuery.isError ? (
             <ErrorBanner message={getApiErrorMessage(circlesQuery.error)} />
           ) : null}
-          <ActiveCircles items={activeRows} />
+          {circlesQuery.isLoading ? (
+            <div className="flex justify-center p-8">
+              <LoadingSpinner label={t("dashboard.loadingCircles", "Syncing circles...")} />
+            </div>
+          ) : (
+            <ActiveCircles
+              items={activeRows}
+              onLeave={handleLeave}
+              leavingId={leavingId}
+            />
+          )}
         </div>
       </div>
 

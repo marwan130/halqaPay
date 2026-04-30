@@ -14,6 +14,8 @@ import { PrivacyPage } from "./pages/PrivacyPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { TermsPage } from "./pages/TermsPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
+import { VerifySalaryPage } from "./pages/VerifySalaryPage";
+import { AdminKycPage } from "./pages/AdminKycPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +47,8 @@ export function App() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="circles/new" element={<CreateCirclePage />} />
             <Route path="transactions" element={<TransactionsPage />} />
+            <Route path="verify-salary" element={<VerifySalaryPage />} />
+            <Route path="admin/kyc" element={<AdminKycPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

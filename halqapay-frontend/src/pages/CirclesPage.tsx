@@ -1,7 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import type { ListCirclesParams } from "../api/circles";
+import * as usersApi from "../api/users";
 import { CircleList } from "../components/circles/CircleList";
 import { JoinCircleModal } from "../components/circles/JoinCircleModal";
 import { ErrorBanner } from "../components/shared/ErrorBanner";
@@ -32,21 +34,33 @@ export function CirclesPage() {
   const [maxValue, setMaxValue] = useState("");
   const [modalCircle, setModalCircle] = useState<CircleResponse | null>(null);
 
+  // Fetch the user's own memberships so we can mark cards client-side
+  const myCirclesQuery = useQuery({
+    queryKey: ["users", "me", "circles"],
+    queryFn: usersApi.fetchMyCircles,
+    enabled: !!token
+  });
+
+  const joinedCircleIds = useMemo<Set<string>>(() => {
+    const all = [
+      ...(myCirclesQuery.data?.activeCircles ?? []),
+      ...(myCirclesQuery.data?.completedCircles ?? [])
+    ];
+    return new Set(all.map((m) => String(m.circleId)));
+  }, [myCirclesQuery.data]);
+
   function normalizeMoneyInput(value: string) {
     const n = Number(value);
     if (!Number.isFinite(n)) return value;
     return n.toFixed(2);
   }
 
-  const listParams = useMemo((): ListCirclesParams => {
-    const p: ListCirclesParams = { status: "OPEN" };
-    if (currency) p.currency = currency;
-    const min = minValue.trim() ? Number(minValue) : NaN;
-    if (Number.isFinite(min)) p.minValue = min;
-    const max = maxValue.trim() ? Number(maxValue) : NaN;
-    if (Number.isFinite(max)) p.maxValue = max;
-    return p;
-  }, [currency, minValue, maxValue]);
+  const listParams: ListCirclesParams = { status: "OPEN" };
+  if (currency) listParams.currency = currency;
+  const minV = minValue.trim() ? Number(minValue) : NaN;
+  if (Number.isFinite(minV)) listParams.minValue = minV;
+  const maxV = maxValue.trim() ? Number(maxValue) : NaN;
+  if (Number.isFinite(maxV)) listParams.maxValue = maxV;
 
   const { data: circles, isLoading, isError, error, refetch } =
     useCirclesList(listParams);
@@ -58,6 +72,7 @@ export function CirclesPage() {
     }
     setModalCircle(circle);
   }
+
 
   return (
     <main className="mx-auto max-w-containerMax px-gutter py-10">
@@ -178,7 +193,11 @@ export function CirclesPage() {
         {isLoading ? <LoadingSpinner label={t("circles.loading")} /> : null}
         {isError ? <ErrorBanner message={getApiErrorMessage(error)} /> : null}
         {!isLoading && !isError && circles ? (
-          <CircleList circles={circles} onJoin={handleJoinClick} />
+          <CircleList
+            circles={circles}
+            onJoin={handleJoinClick}
+            joinedCircleIds={joinedCircleIds}
+          />
         ) : null}
       </div>
 

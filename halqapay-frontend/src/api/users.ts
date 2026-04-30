@@ -28,6 +28,7 @@ export function profileToUserSummary(p: UserProfileResponse): UserSummary {
     fullName: p.fullName,
     salary: String(p.salary),
     walletBalance: String(p.walletBalance),
-    currency: p.currency
+    currency: p.currency,
+    kycStatus: p.kycStatus
   };
 }

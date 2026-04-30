@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,13 +25,27 @@ const inputClass =
 export function CreateCirclePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [totalValue, setTotalValue] = useState("8000");
   const [durationMonths, setDurationMonths] = useState("5");
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
   const [maxMembers, setMaxMembers] = useState("10");
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: circlesApi.createCircle,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["circles"] });
+      queryClient.invalidateQueries({ queryKey: ["users", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["users", "me", "circles"] });
+      setSuccess(true);
+    },
+    onError: (err) => {
+      setError(getApiErrorMessage(err));
+    }
+  });
 
   function normalizeMoneyInput(value: string) {
     const n = Number(value);
@@ -56,21 +71,82 @@ export function CreateCirclePage() {
       setError(t("createCircle.invalidMembers"));
       return;
     }
-    setSubmitting(true);
-    try {
-      await circlesApi.createCircle({
-        name,
-        totalValue: tv,
-        durationMonths: dm,
-        currency,
-        maxMembers: mm
-      });
-      navigate("/circles", { replace: true });
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setSubmitting(false);
-    }
+
+    mutation.mutate({
+      name,
+      totalValue: tv,
+      durationMonths: dm,
+      currency,
+      maxMembers: mm
+    });
+  }
+
+  if (success) {
+    return (
+      <main className="mx-auto max-w-lg px-gutter py-20 text-center">
+        <div className="flex flex-col items-center space-y-6 animate-fade-in-up">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success-container text-success-on shadow-lg shadow-success-container/20">
+            <span className="material-symbols-outlined text-5xl">verified</span>
+          </div>
+          <h1 className="text-3xl font-black text-primary">{t("createCircle.successTitle", "Circle Created!")}</h1>
+          <p className="text-lg text-on-surface-variant font-medium">
+            {t("createCircle.successSubtitle", "Your circle is now live and you've been joined as the first member.")}
+          </p>
+          <div className="flex flex-col gap-3 w-full pt-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full rounded-xl bg-primary py-4 text-lg font-bold text-primary-on shadow-card transition-all hover:scale-[1.02] active:scale-95"
+            >
+              {t("createCircle.goToDashboard", "Go to Dashboard")}
+            </button>
+            <Link
+              to="/circles"
+              className="w-full rounded-xl border-2 border-primary py-4 text-lg font-bold text-primary transition-all hover:bg-surface-low text-center"
+            >
+              {t("createCircle.viewAll", "View All Circles")}
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="mx-auto max-w-lg px-gutter py-20 text-center">
+        <div className="flex flex-col items-center space-y-6 animate-fade-in-up">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-error-container text-error-on shadow-lg shadow-error-container/20">
+            <span className="material-symbols-outlined text-5xl">error</span>
+          </div>
+          <h1 className="text-3xl font-black text-primary">{t("createCircle.errorTitle", "Creation Failed")}</h1>
+          <div className="rounded-2xl bg-error-container/10 p-6 border border-error-container/20">
+            <p className="text-lg text-error font-bold leading-relaxed">
+              {error}
+            </p>
+          </div>
+          <p className="text-on-surface-variant font-medium">
+            {t("createCircle.errorSubtitle", "Please adjust your circle parameters and try again.")}
+          </p>
+          <div className="flex flex-col gap-3 w-full pt-4">
+            <button
+              onClick={() => {
+                setError(null);
+                mutation.reset();
+              }}
+              className="w-full rounded-xl bg-primary py-4 text-lg font-bold text-primary-on shadow-card transition-all hover:scale-[1.02] active:scale-95"
+            >
+              {t("createCircle.tryAgain", "Adjust & Try Again")}
+            </button>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full rounded-xl border-2 border-primary py-4 text-lg font-bold text-primary transition-all hover:bg-surface-low"
+            >
+              {t("createCircle.cancel", "Back to Dashboard")}
+            </button>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -169,10 +245,10 @@ export function CreateCirclePage() {
         </div>
         <button
           type="submit"
-          disabled={submitting}
+          disabled={mutation.isPending}
           className="w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-on shadow-card hover:opacity-95 disabled:opacity-60"
         >
-          {submitting ? t("createCircle.submitting") : t("createCircle.submit")}
+          {mutation.isPending ? t("createCircle.submitting") : t("createCircle.submit")}
         </button>
       </form>
     </main>
