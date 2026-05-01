@@ -15,3 +15,22 @@ HalqaPay is a hackathon MVP for platform-managed savings circles.
    - Frontend uses `halqapay-frontend/.env`.
 2. Start services:
    - `docker compose up --build`
+
+## Development Testing
+
+### Frontend
+```bash
+cd halqapay-frontend
+npm run dev
+```
+
+### Backend
+```bash
+cd halqapay-backend
+mvn spring-boot:run
+```
+
+### Prerequisites
+- PostgreSQL database running on localhost:5432
+- Java 17+ for backend
+- Node.js 18+ for frontend
