@@ -11,4 +11,11 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
     List<TransactionEntity> findByUserIdOrderByCreatedAtDesc(UUID userId);
     List<TransactionEntity> findByCircleId(UUID circleId);
+    
+    boolean existsByUserIdAndCircleIdAndTypeAndMonthNumber(
+        UUID userId, 
+        UUID circleId, 
+        com.halqapay.entity.TransactionType type, 
+        Integer monthNumber
+    );
 }

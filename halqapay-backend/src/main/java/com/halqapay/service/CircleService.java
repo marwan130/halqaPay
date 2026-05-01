@@ -500,7 +500,21 @@ public class CircleService {
                 .divide(new BigDecimal(circle.getDurationMonths()), 2, RoundingMode.HALF_UP);
 
         if (user.getWalletBalance().compareTo(monthly) < 0) {
-            throw new RuntimeException("Insufficient wallet balance");
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    String.format("Insufficient wallet balance. You need %.2f %s but only have %.2f %s. Please top up your wallet first.",
+                            monthly, circle.getCurrency(), user.getWalletBalance(), circle.getCurrency()));
+        }
+
+        // Check if user has already paid for the current month
+        // Calculate current month based on circle creation date and current date
+        int currentMonth = calculateCurrentMonth(circle);
+        
+        if (transactionRepository.existsByUserIdAndCircleIdAndTypeAndMonthNumber(
+                userId, circleId, com.halqapay.entity.TransactionType.CONTRIBUTION, currentMonth)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "You have already paid for this month. Each member can only contribute once per month.");
         }
 
         user.setWalletBalance(user.getWalletBalance().subtract(monthly));
@@ -508,11 +522,13 @@ public class CircleService {
 
         com.halqapay.entity.TransactionEntity tx = new com.halqapay.entity.TransactionEntity();
         tx.setUser(user);
+        tx.setCircle(circle);
         tx.setType(com.halqapay.entity.TransactionType.CONTRIBUTION);
         tx.setAmount(monthly);
         tx.setCurrency(circle.getCurrency());
         tx.setStatus(com.halqapay.entity.TransactionStatus.COMPLETED);
         tx.setDescription("Monthly contribution to '" + circle.getName() + "'");
+        tx.setMonthNumber(currentMonth);
         transactionRepository.save(tx);
 
         notificationService.createNotification(user,
@@ -520,6 +536,104 @@ public class CircleService {
                 "Your contribution of " + monthly + " " + circle.getCurrency() +
                         " to '" + circle.getName() + "' has been recorded.",
                 com.halqapay.entity.NotificationEntity.NotificationType.GENERIC);
+
+        // Check if all members have paid and process automatic payout
+        processAutomaticPayout(circle);
+    }
+
+    @Transactional
+    public void processAutomaticPayout(CircleEntity circle) {
+        // Find current month cycle
+        MonthlyCycleEntity currentCycle = monthlyCycleRepository
+                .findByCircleIdAndCompletedFalse(circle.getId())
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (currentCycle == null) {
+            return; // No active cycle found
+        }
+
+        // Check if all members have paid for this cycle
+        int totalMembers = membershipRepository.countByCircleId(circle.getId());
+        BigDecimal expectedTotal = circle.getTotalValue()
+                .divide(new BigDecimal(circle.getDurationMonths()), 2, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal(totalMembers));
+
+        // If all members have paid and payout date is reached, process payout
+        if (currentCycle.getTotalCollected().compareTo(expectedTotal) >= 0 && 
+            currentCycle.getPayoutUser() != null && 
+            isPayoutDateReached(circle, currentCycle)) {
+            
+            // Process payout to the designated user
+            UserEntity payoutUser = currentCycle.getPayoutUser();
+            BigDecimal payoutAmount = currentCycle.getPayoutAmount() != null ? 
+                currentCycle.getPayoutAmount() : expectedTotal;
+
+            // Add funds to payout user's wallet
+            payoutUser.setWalletBalance(payoutUser.getWalletBalance().add(payoutAmount));
+            userRepository.save(payoutUser);
+
+            // Create payout transaction
+            TransactionEntity payoutTx = new TransactionEntity();
+            payoutTx.setUser(payoutUser);
+            payoutTx.setType(TransactionType.CIRCLE_PAYOUT);
+            payoutTx.setAmount(payoutAmount);
+            payoutTx.setCurrency(circle.getCurrency());
+            payoutTx.setStatus(TransactionStatus.COMPLETED);
+            payoutTx.setDescription("Monthly payout from '" + circle.getName() + "' - Month " + currentCycle.getMonthNumber());
+            transactionRepository.save(payoutTx);
+
+            // Mark cycle as completed
+            currentCycle.setCompleted(true);
+            monthlyCycleRepository.save(currentCycle);
+
+            // Send notification to payout user
+            notificationService.createNotification(payoutUser,
+                    "Circle Payout Received",
+                    "You have received " + payoutAmount + " " + circle.getCurrency() +
+                            " from '" + circle.getName() + "' for month " + currentCycle.getMonthNumber() + ".",
+                    NotificationEntity.NotificationType.CIRCLE_PAYOUT);
+
+            // Notify all members that payout has been processed
+            List<UserEntity> allMembers = membershipRepository.findByCircleId(circle.getId())
+                    .stream()
+                    .map(membership -> membership.getUser())
+                    .collect(Collectors.toList());
+
+            for (UserEntity member : allMembers) {
+                notificationService.createNotification(member,
+                        "Payout Processed",
+                        "Monthly payout of " + payoutAmount + " " + circle.getCurrency() +
+                                " has been sent to " + payoutUser.getFullName() + " for month " + currentCycle.getMonthNumber() + ".",
+                        NotificationEntity.NotificationType.CIRCLE_PAYOUT);
+            }
+        }
+    }
+
+    private int calculateCurrentMonth(CircleEntity circle) {
+        // Calculate which month of the circle we're currently in
+        // This is a simplified calculation - in production you'd want more sophisticated logic
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
+        java.time.OffsetDateTime circleStart = circle.getCreatedAt();
+        
+        if (circleStart == null) {
+            return 1; // Default to first month if no creation date
+        }
+        
+        // Calculate months difference
+        long monthsDifference = java.time.temporal.ChronoUnit.MONTHS.between(circleStart, now);
+        
+        // Ensure we don't exceed the circle duration
+        int currentMonth = (int) (monthsDifference + 1);
+        return Math.min(currentMonth, circle.getDurationMonths());
+    }
+
+    private boolean isPayoutDateReached(CircleEntity circle, MonthlyCycleEntity cycle) {
+        // For simplicity, we'll check if the cycle date is in the past
+        // In a real implementation, this would check the specific payout date
+        return cycle.getCycleDate() != null && 
+               cycle.getCycleDate().isBefore(java.time.OffsetDateTime.now());
     }
 
     private String generateInviteCode() {

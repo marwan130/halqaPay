@@ -21,7 +21,7 @@ export function ContactPage() {
   }
 
   return (
-    <main className={`mx-auto max-w-containerMax px-gutter py-16 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+    <main className={`mx-auto max-w-containerMax px-gutter pt-24 pb-16 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
       <div className="flex flex-col space-y-12">
         <div className="animate-fade-in-up space-y-4">
           <h1 className="text-4xl font-black text-primary md:text-5xl">{t("contact.title")}</h1>

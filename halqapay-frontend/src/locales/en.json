@@ -255,8 +255,10 @@
     "remainingToPay": "Amount remaining to pay",
     "myPayoutMonth": "It's your payout month! No payment needed this cycle.",
     "payNow": "Pay {{amount}} contribution",
+    "payMyTurn": "Pay My Turn - {{amount}}",
     "paying": "Processing…",
     "paySuccess": "Contribution paid successfully!",
+    "insufficientBalance": "Insufficient wallet balance. You need {{required}} {{currency}} but only have {{available}} {{currency}}. Please top up your wallet first.",
     "membersTitle": "Circle Members & Payout Schedule",
     "you": "You",
     "slotPayoutDate": "Payout on {{date}}",
@@ -287,7 +289,7 @@
     "percent": "{{pct}}% used"
   },
   "createCircle": {
-    "back": "← Back to circles",
+    "back": "Back to circles",
     "title": "Start a new circle",
     "subtitle": "Set the total savings amount, how many months it runs, and how many people can join.",
     "name": "Circle name",
@@ -455,7 +457,8 @@
       "fairnessTitle": "Fair payout rotation",
       "fairnessBody": "Circle rules and payout order are explicit, so members know exactly when they will receive funds.",
       "regionalTitle": "Built for the region",
-      "regionalBody": "Arabic first UX, local currency support, and familiar savings behavior tailored for local communities."
+      "regionalBody": "Arabic first UX, local currency support, and familiar savings behavior tailored for local communities.",
+      "regionalStat": "9 Currencies supported"
     },
     "ctaTitle": "Ready to experience trusted savings?"
   },

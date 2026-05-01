@@ -57,8 +57,8 @@ export function NotificationInbox() {
       >
         <span className="material-symbols-outlined text-2xl">notifications</span>
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-error text-[10px] font-bold text-error-on shadow-sm">
-            {unreadCount > 9 ? "9+" : unreadCount}
+          <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-warning text-xs font-black text-warning-on shadow-lg border-2 border-surface-lowest">
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>

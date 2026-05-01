@@ -143,16 +143,22 @@ function ShareModal({ row, onClose }: { row: ActiveCircleRow; onClose: () => voi
 export function ActiveCircles({
   items,
   onLeave,
-  leavingId
+  leavingId,
+  sharingRow,
+  setSharingRow,
+  detailCircle,
+  setDetailCircle
 }: {
   items: ActiveCircleRow[];
   onLeave?: (circleId: string) => void;
   leavingId?: string | null;
+  sharingRow: ActiveCircleRow | null;
+  setSharingRow: (row: ActiveCircleRow | null) => void;
+  detailCircle: { id: string; name: string } | null;
+  setDetailCircle: (circle: { id: string; name: string } | null) => void;
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith("ar") ? "ar-EG" : "en-US";
-  const [sharingRow, setSharingRow] = useState<ActiveCircleRow | null>(null);
-  const [detailCircle, setDetailCircle] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <>
@@ -214,7 +220,10 @@ export function ActiveCircles({
                     {/* Share button — always visible for creator/members */}
                     <button
                       type="button"
-                      onClick={() => setSharingRow(row)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSharingRow(row);
+                      }}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-bold text-primary transition-all hover:bg-primary/10 active:scale-95"
                     >
                       <span className="material-symbols-outlined text-sm">share</span>
@@ -225,7 +234,10 @@ export function ActiveCircles({
                     {row.circleStatus === "OPEN" && onLeave ? (
                       <button
                         type="button"
-                        onClick={() => onLeave(row.circleId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onLeave(row.circleId);
+                        }}
                         disabled={leavingId === row.circleId}
                         className="rounded-lg border border-error/30 px-3 py-1.5 text-xs font-bold text-error transition-all hover:bg-error/5 active:scale-95 disabled:opacity-50"
                       >
@@ -239,15 +251,6 @@ export function ActiveCircles({
           </ul>
         )}
       </section>
-
-      {sharingRow && <ShareModal row={sharingRow} onClose={() => setSharingRow(null)} />}
-      {detailCircle && (
-        <CircleDetailDrawer
-          circleId={detailCircle.id}
-          circleName={detailCircle.name}
-          onClose={() => setDetailCircle(null)}
-        />
-      )}
     </>
   );
 }

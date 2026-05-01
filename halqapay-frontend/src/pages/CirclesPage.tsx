@@ -16,15 +16,7 @@ import { useAuthStore } from "../store/authStore";
 import type { CircleResponse, CurrencyCode } from "../types";
 
 const currencies: CurrencyCode[] = [
-  "USD",
-  "EGP",
-  "SAR",
-  "AED",
-  "KWD",
-  "QAR",
-  "BHD",
-  "OMR",
-  "JOD"
+  "USD","EGP","SAR","AED","KWD","QAR","BHD","OMR","JOD",
 ];
 
 export function CirclesPage() {
@@ -33,8 +25,8 @@ export function CirclesPage() {
   const token = useAuthStore((s) => s.token);
   const queryClient = useQueryClient();
 
-  const [modalCircle, setModalCircle] = useState<CircleResponse | null>(null);
-  const [inviteCode, setInviteCode] = useState("");
+  const [modalCircle,    setModalCircle]    = useState<CircleResponse | null>(null);
+  const [inviteCode,     setInviteCode]     = useState("");
   const [joinByCodeError, setJoinByCodeError] = useState<string | null>(null);
   const [showJoinSuccess, setShowJoinSuccess] = useState(false);
 
@@ -51,9 +43,7 @@ export function CirclesPage() {
         setJoinByCodeError(res.reason || "Unable to join circle");
       }
     },
-    onError: (err) => {
-      setJoinByCodeError(getApiErrorMessage(err));
-    }
+    onError: (err) => setJoinByCodeError(getApiErrorMessage(err))
   });
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -63,10 +53,7 @@ export function CirclesPage() {
       const normalized = codeFromUrl.toUpperCase().trim();
       setInviteCode(normalized);
       setSearchParams({}, { replace: true });
-      if (token) {
-        setJoinByCodeError(null);
-        joinByCodeMutation.mutate(normalized);
-      }
+      if (token) { setJoinByCodeError(null); joinByCodeMutation.mutate(normalized); }
     }
   }, []);
 
@@ -87,8 +74,7 @@ export function CirclesPage() {
   const maxV = maxValue.trim() ? Number(maxValue) : NaN;
   if (Number.isFinite(maxV)) listParams.maxValue = maxV;
 
-  const { data: circles, isLoading, isError, error, refetch } =
-    useCirclesList(listParams);
+  const { data: circles, isLoading, isError, error, refetch } = useCirclesList(listParams);
 
   const myCirclesQuery = useQuery({
     queryKey: ["users", "me", "circles"],
@@ -105,175 +91,201 @@ export function CirclesPage() {
   }, [myCirclesQuery.data]);
 
   function handleJoinClick(circle: CircleResponse) {
-    if (!token) {
-      navigate("/login", { state: { from: "/circles" } });
-      return;
-    }
+    if (!token) { navigate("/login", { state: { from: "/circles" } }); return; }
     setModalCircle(circle);
   }
-
   function handleJoinByCodeSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) {
-      navigate("/login", { state: { from: "/circles" } });
-      return;
-    }
+    if (!token) { navigate("/login", { state: { from: "/circles" } }); return; }
     if (!inviteCode.trim()) return;
     setJoinByCodeError(null);
     joinByCodeMutation.mutate(inviteCode.trim());
   }
 
+  const hasFilters = !!currency || !!minValue || !!maxValue;
+
   return (
-    <main className="mx-auto max-w-containerMax px-gutter py-10">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-primary md:text-3xl">
+    <div className="min-h-screen">
+      <div className="page-hero-bg px-gutter pt-28 pb-28">
+        <img
+          src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1600&q=70"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.10] mix-blend-luminosity pointer-events-none select-none animate-slow-zoom"
+        />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/[0.06]" />
+          <div className="absolute left-1/2 top-1/2 h-[580px] w-[580px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.03] animate-spin-slow" />
+          {([
+            { sym: "₿", x: "7%",  top: "55%", size: "2.8rem", dur: "18s", delay: "0s",  rot: "-12deg", op: "0.10", color: "#fed65b" },
+            { sym: "€", x: "87%", top: "45%", size: "2.2rem", dur: "20s", delay: "2s",  rot: "-6deg",  op: "0.09", color: "#fff" },
+            { sym: "↑", x: "76%", top: "68%", size: "2rem",   dur: "15s", delay: "1s",  rot: "0deg",   op: "0.10", color: "#4ade80" },
+            { sym: "$", x: "22%", top: "28%", size: "1.6rem", dur: "22s", delay: "3s",  rot: "8deg",   op: "0.07", color: "#fff" },
+          ] as const).map(({ sym, x, top, size, dur, delay, rot, op, color }, i) => (
+            <span key={i} className="float-symbol" style={{ left: x, top, fontSize: size, color, "--fs-dur": dur, "--fs-delay": delay, "--fs-rot": rot, "--fs-op": op } as React.CSSProperties}>{sym}</span>
+          ))}
+        </div>
+        <div className="mx-auto max-w-containerMax relative z-10">
+          <div className="hp-pill-glass mb-4 w-fit">{t("nav.circles")}</div>
+          <h1 className="text-4xl font-black text-white md:text-5xl tracking-tight">
             {t("circles.title")}
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
+          <p className="mt-3 max-w-xl text-base text-white/65">
             {t("circles.subtitle")}
           </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {token ? (
-            <div className="flex items-center gap-2">
-              <form onSubmit={handleJoinByCodeSubmit} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder={t("circles.enterCode")}
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                  className="rounded-lg border border-outline-variant bg-surface-lowest px-3 py-2 text-sm font-bold text-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 w-32"
-                />
-                <button
-                  type="submit"
-                  disabled={joinByCodeMutation.isPending}
-                  className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-on shadow-card hover:opacity-95 disabled:opacity-60"
+
+          {/* Top action bar */}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {token ? (
+              <>
+                {/* Invite code form */}
+                <form
+                  onSubmit={handleJoinByCodeSubmit}
+                  className="flex items-center gap-0 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur-sm"
                 >
-                  {joinByCodeMutation.isPending ? "..." : t("circles.join")}
-                </button>
-              </form>
-              <div className="h-6 w-px bg-outline-variant mx-1" />
-              <Link
-                to="/circles/new"
-                className="inline-flex rounded-lg bg-secondary-container px-4 py-2 text-sm font-bold text-on-secondary-container shadow-card hover:brightness-95"
-              >
-                {t("circles.create")}
-              </Link>
-            </div>
-          ) : null}
-          {!token ? (
-            <p className="text-sm text-on-surface">
+                  <input
+                    type="text"
+                    placeholder={t("circles.enterCode")}
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                    className="bg-transparent px-4 py-2.5 text-sm font-bold text-white placeholder-white/40 outline-none w-36"
+                  />
+                  <button
+                    type="submit"
+                    disabled={joinByCodeMutation.isPending}
+                    className="btn-shimmer bg-accent px-4 py-2.5 text-sm font-black text-primary disabled:opacity-60"
+                  >
+                    {joinByCodeMutation.isPending ? "…" : t("circles.join")}
+                  </button>
+                </form>
+
+                <Link
+                  to="/circles/new"
+                  className="btn-ieee btn-shimmer inline-flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/20"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                  {t("circles.create")}
+                </Link>
+              </>
+            ) : (
               <button
                 type="button"
                 onClick={() => navigate("/login", { state: { from: "/circles" } })}
-                className="font-bold text-secondary underline-offset-2 hover:underline"
+                className="btn-ieee btn-shimmer rounded-2xl bg-accent px-6 py-2.5 text-sm font-black text-primary"
               >
                 {t("common.loginLink")}
-              </button>{" "}
-              {t("circles.loginToJoin")}
-            </p>
-          ) : null}
-        </div>
-        {joinByCodeError && (
-          <div className="mt-2 text-right">
-            <span className="text-xs font-bold text-error bg-error-container/10 px-3 py-1 rounded-full border border-error-container/20">
-              {joinByCodeError}
-            </span>
+              </button>
+            )}
           </div>
-        )}
+
+          {/* Error below code form */}
+          {joinByCodeError && (
+            <div className="mt-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-danger/20 px-4 py-1.5 text-xs font-bold text-danger-container border border-danger/20">
+                <span className="material-symbols-outlined text-sm">error</span>
+                {joinByCodeError}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <section className="mt-8 rounded-card border border-outline-variant bg-surface-lowest p-5 shadow-card">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-          {t("circles.filters")}
-        </h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label
-              htmlFor="filter-currency"
-              className="block text-xs font-bold text-on-surface-variant"
-            >
-              {t("circles.currency")}
-            </label>
-            <select
-              id="filter-currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-lowest px-3 py-2.5 text-sm font-medium text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-            >
-              <option value="">{t("circles.any")}</option>
-              {currencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+      {/* ── Main content, overlapping hero ── */}
+      <div className="relative mx-auto max-w-containerMax px-gutter -mt-14 pb-16">
+        {/* Floating currency symbols in white area */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          {([
+            { sym: "₿", x: "2%",  top: "10%", size: "2.5rem", dur: "20s", delay: "0s",  rot: "-8deg",  op: "0.04", color: "#002645" },
+            { sym: "$", x: "93%", top: "6%",  size: "2rem",   dur: "18s", delay: "3s",  rot: "12deg",  op: "0.04", color: "#fed65b" },
+            { sym: "€", x: "91%", top: "52%", size: "1.8rem", dur: "22s", delay: "1s",  rot: "-6deg",  op: "0.04", color: "#002645" },
+            { sym: "↗", x: "3%",  top: "62%", size: "1.5rem", dur: "16s", delay: "5s",  rot: "0deg",   op: "0.05", color: "#002645" },
+            { sym: "%", x: "50%", top: "88%", size: "1.4rem", dur: "24s", delay: "7s",  rot: "-10deg", op: "0.03", color: "#fed65b" },
+          ] as const).map(({ sym, x, top, size, dur, delay, rot, op, color }, i) => (
+            <span key={i} className="float-symbol" style={{ left: x, top, fontSize: size, color, "--fs-dur": dur, "--fs-delay": delay, "--fs-rot": rot, "--fs-op": op } as React.CSSProperties}>{sym}</span>
+          ))}
+          <div className="absolute right-8 top-28 h-[200px] w-[200px] rounded-full border border-primary/[0.04] animate-spin-slow" />
+          <div className="absolute left-4 bottom-32 h-[130px] w-[130px] rounded-full border border-accent/[0.05] animate-pulse-slow" />
+          <div className="absolute right-1/3 bottom-16 h-[80px] w-[80px] rounded-full bg-accent/[0.03] animate-blob" />
+        </div>
+        {/* ── Glass filter panel ── */}
+        <div className="relative z-10">
+        <div className="hp-glass-card mb-8 rounded-[2rem] p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary/60">
+              <span className="material-symbols-outlined text-lg text-primary/40">tune</span>
+              {t("circles.filters")}
+            </h2>
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={() => { setCurrency(""); setMinValue(""); setMaxValue(""); }}
+                className="flex items-center gap-1 rounded-full bg-primary/8 px-3 py-1 text-xs font-bold text-primary/70 hover:bg-primary/12 transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+                {t("circles.clearFilters")}
+              </button>
+            )}
           </div>
-          <div>
-            <label
-              htmlFor="filter-min"
-              className="block text-xs font-bold text-on-surface-variant"
-            >
-              {t("circles.minValue")}
-            </label>
-            <input
-              id="filter-min"
-              type="number"
-              min={0}
-              step="0.01"
-              value={minValue}
-              onChange={(e) => setMinValue(e.target.value)}
-              onBlur={(e) => setMinValue(normalizeMoneyInput(e.target.value))}
-              placeholder={t("circles.any")}
-              className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-lowest px-3 py-2.5 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="filter-max"
-              className="block text-xs font-bold text-on-surface-variant"
-            >
-              {t("circles.maxValue")}
-            </label>
-            <input
-              id="filter-max"
-              type="number"
-              min={0}
-              step="0.01"
-              value={maxValue}
-              onChange={(e) => setMaxValue(e.target.value)}
-              onBlur={(e) => setMaxValue(normalizeMoneyInput(e.target.value))}
-              placeholder={t("circles.any")}
-              className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-lowest px-3 py-2.5 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              type="button"
-              onClick={() => {
-                setCurrency("");
-                setMinValue("");
-                setMaxValue("");
-              }}
-              className="w-full rounded-lg border border-outline-variant px-3 py-2.5 text-sm font-bold text-primary hover:bg-surface-low"
-            >
-              {t("circles.clearFilters")}
-            </button>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label htmlFor="filter-currency" className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                {t("circles.currency")}
+              </label>
+              <select
+                id="filter-currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="hp-input"
+              >
+                <option value="">{t("circles.any")}</option>
+                {currencies.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="filter-min" className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                {t("circles.minValue")}
+              </label>
+              <input
+                id="filter-min"
+                type="number"
+                min={0}
+                step="0.01"
+                value={minValue}
+                onChange={(e) => setMinValue(e.target.value)}
+                onBlur={(e) => setMinValue(normalizeMoneyInput(e.target.value))}
+                placeholder={t("circles.any")}
+                className="hp-input"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-max" className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                {t("circles.maxValue")}
+              </label>
+              <input
+                id="filter-max"
+                type="number"
+                min={0}
+                step="0.01"
+                value={maxValue}
+                onChange={(e) => setMaxValue(e.target.value)}
+                onBlur={(e) => setMaxValue(normalizeMoneyInput(e.target.value))}
+                placeholder={t("circles.any")}
+                className="hp-input"
+              />
+            </div>
           </div>
         </div>
-      </section>
 
-      <div className="mt-8">
-        {isLoading ? <LoadingSpinner label={t("circles.loading")} /> : null}
-        {isError ? <ErrorBanner message={getApiErrorMessage(error)} /> : null}
-        {!isLoading && !isError && circles ? (
-          <CircleList
-            circles={circles}
-            onJoin={handleJoinClick}
-            joinedCircleIds={joinedCircleIds}
-          />
-        ) : null}
+        {/* ── Circle list ── */}
+        <div className="mt-2">
+          {isLoading ? <LoadingSpinner label={t("circles.loading")} /> : null}
+          {isError   ? <ErrorBanner   message={getApiErrorMessage(error)} /> : null}
+          {!isLoading && !isError && circles ? (
+            <CircleList circles={circles} onJoin={handleJoinClick} joinedCircleIds={joinedCircleIds} />
+          ) : null}
+        </div>
+        </div>{/* end z-10 wrapper */}
       </div>
 
       <JoinCircleModal
@@ -282,7 +294,6 @@ export function CirclesPage() {
         onClose={() => setModalCircle(null)}
         onSuccess={() => refetch()}
       />
-
       <SuccessModal
         open={showJoinSuccess}
         onClose={() => setShowJoinSuccess(false)}
@@ -291,6 +302,6 @@ export function CirclesPage() {
         actionLabel={t("circles.goToDashboard")}
         onAction={() => navigate("/dashboard")}
       />
-    </main>
+    </div>
   );
 }

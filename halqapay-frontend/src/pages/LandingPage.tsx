@@ -40,10 +40,50 @@ export function LandingPage() {
   ];
 
   return (
-    <div className="bg-transparent font-sans">
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden px-gutter pb-24 pt-16 md:pt-32">
-        <div className="mx-auto grid max-w-containerMax grid-cols-1 items-center gap-16 lg:grid-cols-2">
+    <div className="bg-transparent font-sans min-h-screen">
+      <section className="relative overflow-hidden px-gutter pb-24 pt-28 md:pt-40">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        {[
+          { sym: "₿", x: "8%",  top: "75%", size: "3.5rem", dur: "16s", delay: "0s",    rot: "-12deg", op: "0.08", color: "#fed65b" },
+          { sym: "$", x: "18%", top: "60%", size: "5rem",   dur: "20s", delay: "2.5s",  rot: "8deg",   op: "0.06", color: "#002645" },
+          { sym: "€", x: "72%", top: "80%", size: "4rem",   dur: "18s", delay: "1s",    rot: "-6deg",  op: "0.07", color: "#002645" },
+          { sym: "£", x: "85%", top: "65%", size: "2.8rem", dur: "14s", delay: "4s",    rot: "15deg",  op: "0.07", color: "#fed65b" },
+          { sym: "¥", x: "55%", top: "85%", size: "3rem",   dur: "22s", delay: "1.8s",  rot: "-8deg",  op: "0.05", color: "#002645" },
+          { sym: "₹", x: "40%", top: "70%", size: "2.5rem", dur: "17s", delay: "3.2s",  rot: "10deg",  op: "0.06", color: "#002645" },
+          { sym: "₪", x: "92%", top: "50%", size: "2rem",   dur: "13s", delay: "5s",    rot: "-18deg", op: "0.05", color: "#fed65b" },
+          { sym: "€", x: "62%", top: "55%", size: "2rem",   dur: "19s", delay: "6s",    rot: "5deg",   op: "0.04", color: "#002645" },
+          { sym: "₿", x: "30%", top: "90%", size: "2rem",   dur: "25s", delay: "7.5s",  rot: "-3deg",  op: "0.04", color: "#fed65b" },
+          { sym: "↑", x: "12%", top: "40%", size: "3rem",   dur: "15s", delay: "0.5s",  rot: "0deg",   op: "0.09", color: "#006d3d" },
+          { sym: "↗", x: "25%", top: "50%", size: "2.5rem", dur: "21s", delay: "3s",    rot: "0deg",   op: "0.07", color: "#006d3d" },
+          { sym: "%", x: "78%", top: "40%", size: "3.5rem", dur: "18s", delay: "2s",    rot: "-10deg", op: "0.06", color: "#002645" },
+          { sym: "↑", x: "90%", top: "75%", size: "2rem",   dur: "12s", delay: "8s",    rot: "5deg",   op: "0.07", color: "#006d3d" },
+          { sym: "↗", x: "50%", top: "45%", size: "2rem",   dur: "24s", delay: "9s",    rot: "0deg",   op: "0.05", color: "#006d3d" },
+        ].map(({ sym, x, top, size, dur, delay, rot, op, color }, i) => (
+          <span
+            key={i}
+            className="float-symbol"
+            style={{
+              left: x,
+              top,
+              fontSize: size,
+              color,
+              "--fs-dur": dur,
+              "--fs-delay": delay,
+              "--fs-rot": rot,
+              "--fs-op": op,
+            } as React.CSSProperties}
+          >
+            {sym}
+          </span>
+        ))}
+
+        {/* Extra interactive rings that move with scroll — using the ambient orb style */}
+        <div className="absolute top-1/3 right-1/4 h-[220px] w-[220px] rounded-full border border-primary/[0.04] animate-spin-slow" />
+        <div className="absolute bottom-1/4 left-1/5 h-[160px] w-[160px] rounded-full border border-accent/[0.06] animate-pulse-slow" />
+        <div className="absolute top-2/3 right-1/3 h-[100px] w-[100px] rounded-full bg-accent/[0.04] animate-blob" />
+      </div>
+
+      <div className="mx-auto grid max-w-containerMax grid-cols-1 items-center gap-16 lg:grid-cols-2">
           <div className="reveal space-y-10 text-left">
             <div className="hp-pill inline-flex items-center gap-2">
               <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -93,7 +133,7 @@ export function LandingPage() {
       </section>
 
       {/* PILLARS SECTION */}
-      <section className="relative overflow-hidden py-32 bg-white border-y border-slate-100">
+      <section className="relative overflow-hidden py-32 bg-[#eef2f7] border-y border-slate-200/60">
         <div className="mx-auto max-w-containerMax px-gutter">
           <div className="reveal mb-20 text-center">
             <h2 className="text-5xl font-black text-primary md:text-6xl">{t("landing.whyTitle")}</h2>
@@ -253,7 +293,7 @@ export function LandingPage() {
       </section>
 
       {/* RIGHTS SECTION */}
-      <section className="relative border-t border-slate-200 py-32 bg-white">
+      <section className="relative border-t border-slate-200/60 py-32 bg-[#eef2f7]">
         <div className="mx-auto max-w-containerMax px-gutter">
           <div className="reveal reveal-scale hp-glass-card rounded-[4rem] p-16 shadow-2xl border-slate-100">
             <h3 className="text-5xl font-black text-primary leading-tight">{t("landing.rights.title")}</h3>

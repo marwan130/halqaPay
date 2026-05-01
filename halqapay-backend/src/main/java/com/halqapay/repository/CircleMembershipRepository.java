@@ -33,4 +33,7 @@ public interface CircleMembershipRepository extends JpaRepository<CircleMembersh
             @org.springframework.data.repository.query.Param("circleId") java.util.UUID circleId,
             @org.springframework.data.repository.query.Param("slotNumber") int slotNumber
     );
+
+    @org.springframework.data.jpa.repository.Query(value = "SELECT COUNT(*) FROM circle_memberships WHERE circle_id = CAST(:circleId AS UUID)", nativeQuery = true)
+    int countByCircleId(@org.springframework.data.repository.query.Param("circleId") java.util.UUID circleId);
 }

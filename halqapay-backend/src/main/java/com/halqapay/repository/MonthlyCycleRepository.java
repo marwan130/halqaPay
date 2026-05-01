@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface MonthlyCycleRepository extends JpaRepository<MonthlyCycleEntity, UUID> {
     List<MonthlyCycleEntity> findByCircleId(UUID circleId);
     Optional<MonthlyCycleEntity> findByCircleIdAndMonthNumber(UUID circleId, Integer monthNumber);
+    List<MonthlyCycleEntity> findByCircleIdAndCompletedFalse(UUID circleId);
 }

@@ -4,7 +4,7 @@ export function TermsPage() {
   const { t } = useTranslation();
 
   return (
-    <main className="mx-auto max-w-containerMax px-gutter py-12">
+    <main className="mx-auto max-w-containerMax px-gutter pt-28 pb-12">
       <h1 className="text-3xl font-black text-primary md:text-4xl">{t("terms.title")}</h1>
       <p className="mt-4 whitespace-pre-line leading-relaxed text-on-surface-variant">
         {t("terms.body")}
