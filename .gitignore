@@ -1,6 +1,4 @@
 docs/
-stitch_halqapay_trusted_savings_platform/
-halqapay_spec.md
 
 # OS files
 .DS_Store
@@ -42,3 +40,5 @@ logs/
 *~
 
 .fake
+
+.local/
